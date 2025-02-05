@@ -1,0 +1,18 @@
+#id 7
+#liquid
+stone
+stone
+stone
+stone
+stone
+stone
+#viscosity 1
+#flow distance 7
+#model cube
+#material top/stone
+#material bottom/stone
+#material right/stone
+#material left/stone
+#material front/stone
+#material back/stone
+#flags 11010010

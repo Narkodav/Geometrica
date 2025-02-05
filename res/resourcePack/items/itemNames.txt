@@ -1,0 +1,6 @@
+air
+dirt_block
+grass_block
+stone_block
+stone_upper_half
+stone_lower_half

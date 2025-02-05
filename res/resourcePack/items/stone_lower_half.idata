@@ -1,0 +1,17 @@
+#id 5
+#cuboid slabHorizontalDown
+stone
+stone
+stone
+stone
+stone
+stone
+#model cube
+#material top/stone
+#material bottom/stone
+#material right/stone
+#material left/stone
+#material front/stone
+#material back/stone
+#hitbox slabDown
+#flags 11010010

@@ -1,0 +1,17 @@
+#id 2
+#cuboid cube
+grass_block_side
+grass_block_side
+grass_block_top
+grass_block_side
+grass_block_side
+dirt
+#model cube
+#material top/grass_block_top
+#material bottom/dirt
+#material right/grass_block_side
+#material left/grass_block_side
+#material front/grass_block_side
+#material back/grass_block_side
+#hitbox cube
+#flags 11010010

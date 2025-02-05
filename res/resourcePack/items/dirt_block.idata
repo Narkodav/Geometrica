@@ -1,0 +1,17 @@
+#id 1
+#cuboid cube
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+#model cube
+#material top/dirt
+#material bottom/dirt
+#material right/dirt
+#material left/dirt
+#material front/dirt
+#material back/dirt
+#hitbox cube
+#flags 11010010
