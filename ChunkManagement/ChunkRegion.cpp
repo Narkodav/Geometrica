@@ -36,32 +36,29 @@ void ChunkRegion::addAdjacentChunk(ChunkPtr chunk, Directions2DHashed direction)
 		for (int y = 0; y < constWorldHeight; y++)
 			for (int z = 0; z < constChunkSize; z++)
 			{
-				centerAccess.data.getBlock(y, constChunkSize, z) =
-					adjAccess.data.getBlock(y, 0, z);
+				centerAccess.data.setBlock(y, constChunkSize, z, adjAccess.data.getBlock(y, 0, z));
+					
 			}
 		break;
 	case Directions2DHashed::DIRECTION_BACKWARD:
 		for (int y = 0; y < constWorldHeight; y++)
 			for (int z = 0; z < constChunkSize; z++)
 			{
-				centerAccess.data.getBlock(y, -1, z) =
-					adjAccess.data.getBlock(y, constChunkSize - 1, z);
+				centerAccess.data.setBlock(y, -1, z, adjAccess.data.getBlock(y, constChunkSize - 1, z));
 			}
 		break;
 	case Directions2DHashed::DIRECTION_RIGHT:
 		for (int y = 0; y < constWorldHeight; y++)
 			for (int x = 0; x < constChunkSize; x++)
 			{
-				centerAccess.data.getBlock(y, x, constChunkSize) =
-					adjAccess.data.getBlock(y, x, 0);
+				centerAccess.data.setBlock(y, x, constChunkSize, adjAccess.data.getBlock(y, x, 0));
 			}
 		break;
 	case Directions2DHashed::DIRECTION_LEFT:
 		for (int y = 0; y < constWorldHeight; y++)
 			for (int x = 0; x < constChunkSize; x++)
 			{
-				centerAccess.data.getBlock(y, x, -1) =
-					adjAccess.data.getBlock(y, x, constChunkSize - 1);
+				centerAccess.data.setBlock(y, x, -1, adjAccess.data.getBlock(y, x, constChunkSize - 1));
 			}
 		break;
 	}

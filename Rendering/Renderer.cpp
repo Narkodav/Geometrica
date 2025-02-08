@@ -312,14 +312,14 @@ void Renderer::renderCornerDebugOverlay(RenderParams params)
 void Renderer::displayChunkOverlay(RenderParams params)
 {
     const int RADIUS = m_renderDistance + 3; // How many chunks to show in each direction
-    const float TILE_SIZE = 16.0f; // Size of each chunk tile
-    const float OVERLAY_SIZE = TILE_SIZE * (RADIUS * 2 + 7) ; // Size of the overlay window
-          
+    const float FIXED_OVERLAY_SIZE = 300.0f; // Fixed size for the overlay window
+    // Calculate tile size based on the overlay size and radius
+    const float TILE_SIZE = FIXED_OVERLAY_SIZE / (RADIUS * 2 + 7);
 
     // Position in top-right corner
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - OVERLAY_SIZE - 10, 10),
+    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - FIXED_OVERLAY_SIZE - 10, 10),
         ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(OVERLAY_SIZE, OVERLAY_SIZE));
+    ImGui::SetNextWindowSize(ImVec2(FIXED_OVERLAY_SIZE, FIXED_OVERLAY_SIZE));
 
     ImGui::Begin("Chunk Overlay", nullptr,
         ImGuiWindowFlags_NoMove |
@@ -337,7 +337,6 @@ void Renderer::displayChunkOverlay(RenderParams params)
 
     for (auto chunk : chunkStates)
     {
-
         glm::ivec2 chunkPos = chunk.first - params.chunkCoords;
 
         ImVec2 tilePos = ImVec2(
@@ -348,43 +347,48 @@ void Renderer::displayChunkOverlay(RenderParams params)
         auto mapColor = ChunkMap::mapStateColors.find(chunk.second)->second;
         auto color = IM_COL32(mapColor.x, mapColor.y, mapColor.z, mapColor.w);
 
+        // Add a small gap between tiles by reducing the size slightly
+        float gap = 1.0f;
         draw_list->AddRectFilled(
             tilePos,
-            ImVec2(tilePos.x + TILE_SIZE - 1, tilePos.y + TILE_SIZE - 1),
+            ImVec2(tilePos.x + TILE_SIZE - gap, tilePos.y + TILE_SIZE - gap),
             color
         );
 
         auto region = regionData.find(chunk.first);
         if (region == regionData.end())
             continue;
-        // Draw adjacency triangles
-        ImU32 triangleColor = IM_COL32(200, 150, 255, 200); // Semi-transparent white
 
-        // Check and draw for each direction
+        // Draw adjacency triangles
+        ImU32 triangleColor = IM_COL32(200, 150, 255, 200);
+
+        // Adjust triangle size to be proportional to tile size
+        float halfTile = TILE_SIZE / 2;
+
         // North
         if (region->second.getAdj(Directions2DHashed::DIRECTION_BACKWARD) != nullptr) {
             draw_list->AddTriangleFilled(
                 ImVec2(tilePos.x, tilePos.y),
-                ImVec2(tilePos.x + TILE_SIZE, tilePos.y),
-                ImVec2(tilePos.x + TILE_SIZE / 2, tilePos.y + TILE_SIZE / 2),
+                ImVec2(tilePos.x + TILE_SIZE - gap, tilePos.y),
+                ImVec2(tilePos.x + halfTile, tilePos.y + halfTile),
                 triangleColor
             );
         }
         // South
         if (region->second.getAdj(Directions2DHashed::DIRECTION_FORWARD) != nullptr) {
             draw_list->AddTriangleFilled(
-                ImVec2(tilePos.x, tilePos.y + TILE_SIZE),
-                ImVec2(tilePos.x + TILE_SIZE, tilePos.y + TILE_SIZE),
-                ImVec2(tilePos.x + TILE_SIZE / 2, tilePos.y + TILE_SIZE / 2),
+                ImVec2(tilePos.x, tilePos.y + TILE_SIZE - gap),
+                ImVec2(tilePos.x + TILE_SIZE - gap, tilePos.y + TILE_SIZE - gap),
+                ImVec2(tilePos.x + halfTile, tilePos.y + halfTile),
                 triangleColor
             );
         }
         // East
         if (region->second.getAdj(Directions2DHashed::DIRECTION_RIGHT) != nullptr) {
             draw_list->AddTriangleFilled(
-                ImVec2(tilePos.x + TILE_SIZE, tilePos.y),
-                ImVec2(tilePos.x + TILE_SIZE, tilePos.y + TILE_SIZE),
-                ImVec2(tilePos.x + TILE_SIZE / 2, tilePos.y + TILE_SIZE / 2),
+                ImVec2(tilePos.x + TILE_SIZE - gap, tilePos.y),
+                ImVec2(tilePos.x + TILE_SIZE - gap, tilePos.y + TILE_SIZE - gap),
+                ImVec2(tilePos.x + halfTile, tilePos.y + halfTile),
                 triangleColor
             );
         }
@@ -392,8 +396,8 @@ void Renderer::displayChunkOverlay(RenderParams params)
         if (region->second.getAdj(Directions2DHashed::DIRECTION_LEFT) != nullptr) {
             draw_list->AddTriangleFilled(
                 ImVec2(tilePos.x, tilePos.y),
-                ImVec2(tilePos.x, tilePos.y + TILE_SIZE),
-                ImVec2(tilePos.x + TILE_SIZE / 2, tilePos.y + TILE_SIZE / 2),
+                ImVec2(tilePos.x, tilePos.y + TILE_SIZE - gap),
+                ImVec2(tilePos.x + halfTile, tilePos.y + halfTile),
                 triangleColor
             );
         }

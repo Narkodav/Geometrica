@@ -5,7 +5,7 @@
 
 #include "GameEvents.h"
 #include "MultiThreading/EventSystem.h"
-#include "Rendering/ChunkMesh.h"
+#include "ChunkMesh.h"
 #include "Rendering/Skybox.h"
 #include "logger/GlobalParamsLogger.h"
 #include "MultiThreading/MemoryPool.h"

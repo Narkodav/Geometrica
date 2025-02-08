@@ -72,8 +72,8 @@ void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard)
 		if (m_raycastResult.hit)
 		{
 			m_gameContext.gameEvents.emit<GameEventTypes::BLOCK_MODIFIED>(
-				BlockModifiedEvent{ m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal), 
-				DataRepository::getItem("stone_upper_half").id });
+				BlockModifiedEvent{ m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal),
+				DataRepository::getBlock("stone_upper_half")->getId() });
 		}
 	}
 

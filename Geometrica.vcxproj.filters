@@ -45,7 +45,7 @@
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Cuboid.h">
+    <ClInclude Include="DataManagement\Cuboid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Billboard.h">
@@ -57,19 +57,16 @@
     <ClInclude Include="Rendering\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\ChunkMesh.h">
+    <ClInclude Include="Rendering\Meshing\ChunkMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\CubeMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\CuboidMeshData.h">
+    <ClInclude Include="Rendering\Meshing\CuboidMesher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\FrameRateCalculator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\MeshData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Model.h">
@@ -93,13 +90,10 @@
     <ClInclude Include="Rendering\TextureAtlas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\WorldMesh.h">
+    <ClInclude Include="Rendering\Meshing\WorldMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DataManagement\DataRepository.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DataManagement\Item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChunkManagement\Chunk.h">
@@ -159,6 +153,18 @@
     <ClInclude Include="Vendor\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DataManagement\CuboidBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManagement\BlockTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManagement\BlockFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Meshing\MesherTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Keyboard.cpp">
@@ -191,7 +197,7 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Cuboid.cpp">
+    <ClCompile Include="DataManagement\Cuboid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Billboard.cpp">
@@ -203,19 +209,16 @@
     <ClCompile Include="Rendering\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\ChunkMesh.cpp">
+    <ClCompile Include="Rendering\Meshing\ChunkMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\CubeMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\CuboidMeshData.cpp">
+    <ClCompile Include="Rendering\Meshing\CuboidMesher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\FrameRateCalculator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\MeshData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Model.cpp">
@@ -239,13 +242,10 @@
     <ClCompile Include="Rendering\TextureAtlas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\WorldMesh.cpp">
+    <ClCompile Include="Rendering\Meshing\WorldMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DataManagement\DataRepository.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DataManagement\Item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ChunkManagement\Chunk.cpp">
@@ -297,6 +297,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vendor\imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManagement\CuboidBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManagement\BlockTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManagement\BlockFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Meshing\MesherTemplate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

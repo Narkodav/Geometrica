@@ -1,0 +1,10 @@
+#id 2
+#Block type CuboidBlock
+#cuboid cube
+grass_block_side
+grass_block_side
+grass_block_top
+grass_block_side
+grass_block_side
+dirt
+#hitbox cube

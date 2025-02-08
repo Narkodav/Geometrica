@@ -17,7 +17,7 @@
 
 //custom
 #include "Rendering/Shader.h"
-#include "Rendering/WorldMesh.h"
+#include "Rendering/Meshing/WorldMesh.h"
 #include "Player.h"
 #include "FrameRateCalculator.h"
 #include "logger/GlobalParamsLogger.h"

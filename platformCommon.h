@@ -218,4 +218,16 @@ struct Area
 	glm::ivec3 sizes;
 };
 
+enum class BlockMesherType
+{
+	MESHING_CUBOID = 0,			//for block types using cuboid models
+	//MESHING_LIQUID,			//for block types that are liquid derived
+	//MESHING_COMPLICATED,	//for block types that use complicated models (non cuboid models like spheres) WARNING! can affect performance
+	//MESHING_TRANSPARENT,	//for transparent block types like glass
+	//MESHING_TRANSLUCENT,	//for translucent block types like tinted glass
+	MESHING_NUM				//number of meshing techniques
+};
+
+
+
 #endif

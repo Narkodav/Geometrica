@@ -21,14 +21,14 @@ glm::vec3 PhysicsManager::handlePlayerCollisions(glm::vec3 playerCoords, glm::ve
 	glm::vec3 hitboxCoords = playerCoords;
 	hitboxCoords.y += 0.4;
 	glm::vec3 modifiedDelta = delta;
-	const Phys::Hitbox* entityHitbox = DataRepository::getHitbox("player");
+	const Phys::Hitbox* entityHitbox = &DataRepository::getHitbox("player");
 
 	for (int y = gridCoords.y - 1; y < gridCoords.y + 3; y++)
 		for (int x = gridCoords.x - 1; x < gridCoords.x + 2; x++)
 			for (int z = gridCoords.z - 1; z < gridCoords.z + 2; z++)
 			{
 				modifiedDelta = handleBlockCollision(entityHitbox, hitboxCoords, modifiedDelta,
-					DataRepository::getItem(chunkMap.getBlockId(glm::ivec3(x, y, z))).hitboxHandle,
+					DataRepository::getBlock(chunkMap.getBlockId(glm::ivec3(x, y, z)))->getHitbox(),
 					glm::ivec3(x, y, z));
 			}
 
@@ -49,7 +49,7 @@ PhysicsManager::BlockRaycastResult PhysicsManager::raycastBlock(Phys::RayCasting
 			continue;
 		else
 		{
-			auto result = DataRepository::getItem(blockId).hitboxHandle->intersectsRay(ray, blockCoord);
+			auto result = DataRepository::getBlock(blockId)->getHitbox()->intersectsRay(ray, blockCoord);
 			if (result.intersects)
 				return { 1, result.intersectionPoint, result.intersectionNormal,blockCoord, result.distance };
 		}

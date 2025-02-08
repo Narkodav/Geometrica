@@ -139,15 +139,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DataManagement\BlockFactory.h" />
+    <ClInclude Include="DataManagement\BlockTemplate.h" />
+    <ClInclude Include="DataManagement\CuboidBlock.h" />
     <ClInclude Include="ChunkManagement\Chunk.h" />
     <ClInclude Include="ChunkManagement\ChunkData.h" />
     <ClInclude Include="ChunkManagement\ChunkManager.h" />
     <ClInclude Include="ChunkManagement\ChunkMap.h" />
     <ClInclude Include="ChunkManagement\ChunkRegion.h" />
     <ClInclude Include="ChunkManagement\ChunkRegionData.h" />
-    <ClInclude Include="Cuboid.h" />
+    <ClInclude Include="DataManagement\Cuboid.h" />
     <ClInclude Include="DataManagement\DataRepository.h" />
-    <ClInclude Include="DataManagement\Item.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="GameEvents.h" />
@@ -155,6 +157,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="logger\ChunkProcessingProfiler.h" />
     <ClInclude Include="logger\GlobalParamsLogger.h" />
+    <ClInclude Include="Rendering\Meshing\MesherTemplate.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="platformCommon.h" />
@@ -162,11 +165,10 @@
     <ClInclude Include="Rendering\Billboard.h" />
     <ClInclude Include="Rendering\BlockHighlight.h" />
     <ClInclude Include="Rendering\Camera.h" />
-    <ClInclude Include="Rendering\ChunkMesh.h" />
+    <ClInclude Include="Rendering\Meshing\ChunkMesh.h" />
     <ClInclude Include="Rendering\CubeMap.h" />
-    <ClInclude Include="Rendering\CuboidMeshData.h" />
+    <ClInclude Include="Rendering\Meshing\CuboidMesher.h" />
     <ClInclude Include="Rendering\FrameRateCalculator.h" />
-    <ClInclude Include="Rendering\MeshData.h" />
     <ClInclude Include="Rendering\Model.h" />
     <ClInclude Include="Rendering\Renderer.h" />
     <ClInclude Include="Rendering\Scene.h" />
@@ -174,7 +176,7 @@
     <ClInclude Include="Rendering\Skybox.h" />
     <ClInclude Include="Rendering\Texture.h" />
     <ClInclude Include="Rendering\TextureAtlas.h" />
-    <ClInclude Include="Rendering\WorldMesh.h" />
+    <ClInclude Include="Rendering\Meshing\WorldMesh.h" />
     <ClInclude Include="Vendor\imgui\imconfig.h" />
     <ClInclude Include="Vendor\imgui\imgui.h" />
     <ClInclude Include="Vendor\imgui\imgui_impl_glfw.h" />
@@ -189,15 +191,17 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DataManagement\BlockFactory.cpp" />
+    <ClCompile Include="DataManagement\BlockTemplate.cpp" />
+    <ClCompile Include="DataManagement\CuboidBlock.cpp" />
     <ClCompile Include="ChunkManagement\Chunk.cpp" />
     <ClCompile Include="ChunkManagement\ChunkData.cpp" />
     <ClCompile Include="ChunkManagement\ChunkManager.cpp" />
     <ClCompile Include="ChunkManagement\ChunkMap.cpp" />
     <ClCompile Include="ChunkManagement\ChunkRegion.cpp" />
     <ClCompile Include="ChunkManagement\ChunkRegionData.cpp" />
-    <ClCompile Include="Cuboid.cpp" />
+    <ClCompile Include="DataManagement\Cuboid.cpp" />
     <ClCompile Include="DataManagement\DataRepository.cpp" />
-    <ClCompile Include="DataManagement\Item.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="GameEvents.cpp" />
@@ -206,17 +210,17 @@
     <ClCompile Include="logger\ChunkProcessingProfiler.cpp" />
     <ClCompile Include="logger\GlobalParamsLogger.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Rendering\Meshing\MesherTemplate.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Rendering\Billboard.cpp" />
     <ClCompile Include="Rendering\BlockHighlight.cpp" />
     <ClCompile Include="Rendering\Camera.cpp" />
-    <ClCompile Include="Rendering\ChunkMesh.cpp" />
+    <ClCompile Include="Rendering\Meshing\ChunkMesh.cpp" />
     <ClCompile Include="Rendering\CubeMap.cpp" />
-    <ClCompile Include="Rendering\CuboidMeshData.cpp" />
+    <ClCompile Include="Rendering\Meshing\CuboidMesher.cpp" />
     <ClCompile Include="Rendering\FrameRateCalculator.cpp" />
-    <ClCompile Include="Rendering\MeshData.cpp" />
     <ClCompile Include="Rendering\Model.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
     <ClCompile Include="Rendering\Scene.cpp" />
@@ -224,7 +228,7 @@
     <ClCompile Include="Rendering\Skybox.cpp" />
     <ClCompile Include="Rendering\Texture.cpp" />
     <ClCompile Include="Rendering\TextureAtlas.cpp" />
-    <ClCompile Include="Rendering\WorldMesh.cpp" />
+    <ClCompile Include="Rendering\Meshing\WorldMesh.cpp" />
     <ClCompile Include="Vendor\imgui\imgui.cpp" />
     <ClCompile Include="Vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="Vendor\imgui\imgui_draw.cpp" />

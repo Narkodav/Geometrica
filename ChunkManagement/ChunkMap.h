@@ -97,10 +97,10 @@ public:
 
 	void generateChunk(glm::ivec2 coords, Generator& generator);
 	void storeChunk(glm::ivec2 coords);
-	void coupleChunks(MT::Synchronized<ChunkMapData>::WriteAccess& mapAccess, 
-	ChunkRegion& region, glm::ivec2 coords);
-	void decoupleChunks(MT::Synchronized<ChunkMapData>::WriteAccess& mapAccess, 
-	ChunkRegion& region, glm::ivec2 coords);
+	void coupleChunks(MT::Synchronized<ChunkMapData>::WriteAccess& mapAccess,
+		ChunkRegion& region, glm::ivec2 coords);
+	void decoupleChunks(MT::Synchronized<ChunkMapData>::WriteAccess& mapAccess,
+		ChunkRegion& region, glm::ivec2 coords);
 	/*void directStorage(glm::ivec2 coords);*/
 
 	//void tryUpdateMap();
@@ -115,6 +115,17 @@ public:
 		if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
 			return DataRepository::airId;
 		auto access = m_mapData.getReadAccess();
+		auto chunk = access->regions.find(chunkCoords);
+		if (chunk != access->regions.end())
+			return chunk->second.getCenter()->getReadAccess().data.getBlock(localCoords.y, localCoords.x, localCoords.z);
+		return 0;
+	};
+
+	unsigned int getBlockId(glm::ivec3 blockCoords, const MT::Synchronized<ChunkMapData>::WriteAccess& access) const {
+		glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockCoords, constChunkSize);
+		glm::ivec3 localCoords = Utils::globalToLocal(blockCoords, constChunkSize);
+		if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
+			return DataRepository::airId;
 		auto chunk = access->regions.find(chunkCoords);
 		if (chunk != access->regions.end())
 			return chunk->second.getCenter()->getReadAccess().data.getBlock(localCoords.y, localCoords.x, localCoords.z);

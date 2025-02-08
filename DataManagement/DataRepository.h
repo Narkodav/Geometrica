@@ -9,13 +9,15 @@
 #include "Rendering/TextureAtlas.h"
 #include "Physics/Hitboxes.h"
 #include "platformCommon.h"
-#include "Cuboid.h"
-#include "Item.h"
+#include "BlockFactory.h"
+#include "CuboidBlock.h"
+//#include "Item.h"
 
 
 class DataRepository
 {
-	friend class Item;
+	friend class Block;
+	//friend class Item;
 public:
 	//first byte of an item id defines the mesh type (cube, flat plane, custom, etc)
 	//this is the only mesh items with that first byte in id can have
@@ -28,18 +30,18 @@ public:
 	static inline const unsigned int hasPhysicsMask =			0b00000100'00000000'00000000'00000000;
 
 private:
-	static inline std::map<unsigned int, Item> m_items;
-	static inline std::map<std::string, unsigned int> m_itemNameMap;
+	static inline std::map<uint32_t, std::unique_ptr<BlockTemplate>> m_blocks;
+	static inline std::map<std::string, unsigned int> m_blockNameMap;
 	static inline std::map<std::string, Model> m_models;
 	static inline std::map<std::string, Cuboid> m_cuboids;
 	static inline std::map<std::string, Texture> m_textures;
 	static inline std::map<std::string, std::unique_ptr<Phys::Hitbox>> m_hitboxes;
-	static inline TextureAtlas m_itemTexturesAtlas;
+	static inline TextureAtlas m_textureAtlas;
 	static inline std::string m_resourcesFilepath;
 
 	static void readPaths(std::vector<std::string>& container, const std::string& path);
 	
-	static void setItems();
+	static void setBlocks();
 	static void setModels();
 	static void setCuboids();
 	static void setTextures();
@@ -51,14 +53,14 @@ public:
 	static inline bool hasCuboidModel(unsigned int id) { return (id & hasCuboidModelIdMask) != 0; };
 	static inline bool hasDisplayModel(unsigned int id) { return (id & hasDisplayModelIdMask) != 0; };
 
-	static const Item& getItem(unsigned int id) { return m_items.find(id)->second; };
-	static const Item& getItem(std::string name) { return m_items.find(m_itemNameMap.find(name)->second)->second; };
-	static const std::map<unsigned int, Item>& getItems() { return m_items; };
+	static const std::unique_ptr<BlockTemplate>& getBlock(unsigned int id) { return m_blocks.find(id)->second; };
+	static const std::unique_ptr<BlockTemplate>& getBlock(std::string name) { return m_blocks.find(m_blockNameMap.find(name)->second)->second; };
+	static const std::map<unsigned int, std::unique_ptr<BlockTemplate>>& getBlocks() { return m_blocks; };
 	static const Model& getModel(const std::string& modelName) { return m_models.find(modelName)->second; };
 	static const Cuboid& getCuboid(const std::string& cuboidName) { return m_cuboids.find(cuboidName)->second; };
 	static const Texture& getTexture(const std::string& textureName) { return m_textures.find(textureName)->second; };
-	static const TextureAtlas& getAtlas() { return m_itemTexturesAtlas; };
-	static const Phys::Hitbox* getHitbox(const std::string& hitboxName) { return m_hitboxes.find(hitboxName)->second.get(); };
+	static const TextureAtlas& getAtlas() { return m_textureAtlas; };
+	static const Phys::Hitbox& getHitbox(const std::string& hitboxName) { return *m_hitboxes.find(hitboxName)->second.get(); };
 	/*const Texture* getTextureRef(const std::string& textureName) const { return &m_textures[textureName]; };*/
 };
 

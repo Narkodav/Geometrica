@@ -1,4 +1,3 @@
-air
 dirt_block
 grass_block
 stone_block

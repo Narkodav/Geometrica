@@ -20,19 +20,21 @@ void DataRepository::readPaths(std::vector<std::string>& container, const std::s
 	file.close();
 }
 
-void DataRepository::setItems()
+void DataRepository::setBlocks()
 {
-	std::vector<std::string> itemPaths;
-	readPaths(itemPaths, m_resourcesFilepath + "/items/itemNames.txt");
+	std::vector<std::string> blockPaths;
+	readPaths(blockPaths, m_resourcesFilepath + "/blocks/blockNames.txt");
 
 	std::ostringstream path;
-	Item buffer;
+	std::string type;
 
-	for (int i = 0; i < itemPaths.size(); i++)
+	for (int i = 0; i < blockPaths.size(); i++)
 	{
-		path << m_resourcesFilepath << "/items/" << itemPaths[i] << ".idata";
-		buffer.load(path.str());
-		m_items[buffer.id] = buffer;
+		path << m_resourcesFilepath << "/blocks/" << blockPaths[i] << ".bdata";
+		type = BlockTemplate::parseBlockType(path.str());
+		std::unique_ptr<BlockTemplate> block = BlockFactory::createBlock(type, path.str());
+		m_blockNameMap.emplace(block->getName(), block->getId());
+		m_blocks.emplace(block->getId(), std::move(block));
 		path.str("");
 		path.clear();
 	}
@@ -89,9 +91,9 @@ void DataRepository::setTextures()
 		path.clear();
 	}
 
-	m_itemTexturesAtlas.set(texturePaths);
-	m_itemTexturesAtlas.save(m_resourcesFilepath + "/textureAtlas.png");
-	m_itemTexturesAtlas.makeStorageBuffer();
+	m_textureAtlas.set(texturePaths);
+	m_textureAtlas.save(m_resourcesFilepath + "/textureAtlas.png");
+	m_textureAtlas.makeStorageBuffer();
 }
 
 void DataRepository::setHitboxes()
@@ -110,8 +112,22 @@ void DataRepository::setHitboxes()
 	}
 }
 
+void initializeBlockFactory() {
+	BlockFactory::registerBlockType("CuboidBlock",
+		[](const std::string& filepath) {
+			auto block = std::make_unique<CuboidBlock>();
+			if (!block->loadFromFile(filepath)) {
+				return std::unique_ptr<CuboidBlock>(nullptr);
+			}
+			return block;
+		}
+	);
+	// Register other block types here
+}
+
 void DataRepository::set(std::string resourcesFilepath)
 {
+	initializeBlockFactory();
 	m_resourcesFilepath = resourcesFilepath;
 #ifdef _DEBUG
 	std::cout << m_resourcesFilepath << std::endl;
@@ -154,14 +170,14 @@ void DataRepository::set(std::string resourcesFilepath)
 		std::cout << "name: " << hitbox.first << std::endl;
 	}
 #endif //_DEBUG
-	setItems();
+	setBlocks();
 #ifdef _DEBUG
 	std::cout << std::endl;
-	std::cout << "items:" << std::endl;
-	for (const auto& item : m_items)
+	std::cout << "blocks:" << std::endl;
+	for (const auto& block : m_blocks)
 	{
-		std::cout << "id:   " << item.first << std::endl;
-		std::cout << "name: " << item.second.name << std::endl;
+		std::cout << "id:   " << block.first << std::endl;
+		std::cout << "name: " << block.second->getName() << std::endl;
 	}
 #endif //_DEBUG
 }

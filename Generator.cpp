@@ -14,9 +14,9 @@ void Generator::set(unsigned int seed)
 	m_perlinNoise3d1.setSeed(m_seed);
 	m_perlinNoise3d2.setSeed(m_seed ^ UINT_MAX);
 	m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_AIR)] = DataRepository::airId;
-	m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_DIRT)] = DataRepository::getItem("dirt_block").id;
-	m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_GRASS)] = DataRepository::getItem("grass_block").id;
-	m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_STONE)] = DataRepository::getItem("stone_block").id;
+	m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_DIRT)] = DataRepository::getBlock("dirt_block")->getId();
+	m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_GRASS)] = DataRepository::getBlock("grass_block")->getId();
+	m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_STONE)] = DataRepository::getBlock("stone_block")->getId();
 }
 
 bool Generator::shouldBeCave(int x, int y, int z) 
@@ -37,7 +37,7 @@ bool Generator::shouldBeCave(int x, int y, int z)
 ChunkData Generator::getChunkData(glm::ivec2 coords)
 {
 	ChunkData data;
-	data.getCoords() = coords;
+	data.setCoords(coords);
 	glm::ivec3 coords000 = glm::vec3(coords.x * constChunkSize, 0, coords.y * constChunkSize);
 	int height = 0;
 	float amplitudeHight = 16.f;
@@ -49,12 +49,12 @@ ChunkData Generator::getChunkData(glm::ivec2 coords)
 			for (int y = 0; y < height; y++)
 			{
 				if (shouldBeCave(x + coords000.x, y, z + coords000.z))
-					data.getBlock(y, x, z) = m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_AIR)];
-				else data.getBlock(y, x, z) = m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_GRASS)];
+					data.setBlock(y, x, z, m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_AIR)]);
+				else data.setBlock(y, x, z, m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_GRASS)]);
 			}
 			for (int y = height; y < constWorldHeight; y++)
 			{
-				data.getBlock(y, x, z) = m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_AIR)];
+				data.setBlock(y, x, z, m_relevantBlockIds[static_cast<unsigned int>(blockTypes::BLOCK_AIR)]);
 			}
 		}
 	return data;

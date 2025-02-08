@@ -1,0 +1,10 @@
+#id 4
+#Block type CuboidBlock
+#cuboid slabHorizontalUp
+stone
+stone
+stone
+stone
+stone
+stone
+#hitbox slabUp

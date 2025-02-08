@@ -158,15 +158,27 @@ void ChunkMap::changeBlock(glm::ivec3 blockCoords, unsigned int blockId)
 	auto access = m_mapData.getWriteAccess();
 	auto chunk = access->regions.find(chunkCoords);
 	auto state = access->states.find(chunkCoords);
+
 	if (chunk != access->regions.end() && state->second == ChunkState::GENERATED)
 	{
-		auto& block = chunk->second.getCenter()->getWriteAccess().data.
-			getBlock(localCoords.y, localCoords.x, localCoords.z);
-		auto buffer = block;
-		block = blockId;
+		unsigned int previousId;
+		{
+			auto chunkAccess = chunk->second.getCenter()->getWriteAccess();
+			previousId = chunkAccess.data.getBlock(localCoords.y, localCoords.x, localCoords.z);
+			chunkAccess.data.setBlock(localCoords.y, localCoords.x, localCoords.z, blockId);
+		}
 		coupleChunks(access, chunk->second, chunkCoords);
 		m_eventSystem.emit<GameEventTypes::BLOCK_REMESH>(
-			BlockRemeshEvent{ blockCoords, blockId, buffer });
-			
+			BlockRemeshEvent{ blockCoords, blockId, previousId });
+
+		for (int i = 0; i < constDirectionVectors3DHashed.size(); i++)
+		{
+			glm::ivec3 adjCoord = blockCoords + constDirectionVectors3DHashed[i];
+			unsigned int currentId = getBlockId(adjCoord, access);
+			m_eventSystem.emit<GameEventTypes::BLOCK_REMESH>(
+				BlockRemeshEvent{ adjCoord, currentId, currentId });
+		}
+
+		
 	}
 }

@@ -44,7 +44,7 @@ void WorldMesh::drawChunks(Shader& shaderCuboid, Shader& shaderBlock, glm::mat4 
 		auto chunkAccess = chunkMesh.second->getReadAccess();
 		if (chunkAccess->getIsSet())
 		{
-			chunkAccess->drawCuboids();
+			chunkAccess->draw(BlockMesherType::MESHING_CUBOID);
 		}
 	}
 	//DataRepository::getCuboid("slabHorizontalDown").drawTest({ glm::vec3(0), glm::vec3(0.0f, 0.0f, -1.0f) }, { 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 });
@@ -182,56 +182,56 @@ void WorldMesh::blockModified(BlockRemeshEvent data)
 	glm::ivec3 localCoords = Utils::globalToLocal(data.blockCoord, constChunkSize);
 	auto access = m_meshData.getWriteAccess();
 	auto chunk = access->meshes.find(chunkCoords);
-	auto state = access->states.find(chunkCoords);
 	if (chunk != access->meshes.end())
 	{
 		data.blockCoord = localCoords;
-		chunk->second->getWriteAccess()->notifyBlockModification(data);
-		m_bufferLoadQueue.getWriteAccess()->push({ chunkCoords, chunk->second });
-		if (localCoords.x == 0)
-		{
-			auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x - 1, chunkCoords.y));
-			if (chunkAdj != access->meshes.end())
-			{
-				data.blockCoord.x = constChunkSize;
-				chunkAdj->second->getWriteAccess()->notifyBlockModification(data);
-				m_bufferLoadQueue.getWriteAccess()->push(
-					{ glm::ivec2(chunkCoords.x - 1, chunkCoords.y), chunkAdj->second });
-			}
-		}
-		else if (localCoords.x == constChunkSize - 1)
-		{
-			auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x + 1, chunkCoords.y));
-			if (chunkAdj != access->meshes.end())
-			{
-				data.blockCoord.x = -1;
-				chunkAdj->second->getWriteAccess()->notifyBlockModification(data);
-				m_bufferLoadQueue.getWriteAccess()->push(
-					{ glm::ivec2(chunkCoords.x + 1, chunkCoords.y), chunkAdj->second });
-			}
-		}
-		data.blockCoord = localCoords;
-		if (localCoords.z == 0)
-		{
-			auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x, chunkCoords.y - 1));
-			if (chunkAdj != access->meshes.end())
-			{
-				data.blockCoord.z = constChunkSize;
-				chunkAdj->second->getWriteAccess()->notifyBlockModification(data);
-				m_bufferLoadQueue.getWriteAccess()->push(
-					{ glm::ivec2(chunkCoords.x, chunkCoords.y - 1), chunkAdj->second });
-			}
-		}
-		else if (localCoords.z == constChunkSize - 1)
-		{
-			auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x, chunkCoords.y + 1));
-			if (chunkAdj != access->meshes.end())
-			{
-				data.blockCoord.z = -1;
-				chunkAdj->second->getWriteAccess()->notifyBlockModification(data);
-				m_bufferLoadQueue.getWriteAccess()->push(
-					{ glm::ivec2(chunkCoords.x, chunkCoords.y + 1), chunkAdj->second });
-			}
-		}
+		chunk->second->getWriteAccess()->notifyBlockUpdate(data);
+		m_bufferLoadQueue.getWriteAccess()->push({ chunkCoords, chunk->second }); //updates are applied at buffer load
+		
+		//if (localCoords.x == 0)
+		//{
+		//	auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x - 1, chunkCoords.y));
+		//	if (chunkAdj != access->meshes.end())
+		//	{
+		//		data.blockCoord.x = constChunkSize;
+		//		chunkAdj->second->getWriteAccess()->notifyBlockUpdate(data);
+		//		m_bufferLoadQueue.getWriteAccess()->push(
+		//			{ glm::ivec2(chunkCoords.x - 1, chunkCoords.y), chunkAdj->second });
+		//	}
+		//}
+		//else if (localCoords.x == constChunkSize - 1)
+		//{
+		//	auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x + 1, chunkCoords.y));
+		//	if (chunkAdj != access->meshes.end())
+		//	{
+		//		data.blockCoord.x = -1;
+		//		chunkAdj->second->getWriteAccess()->notifyBlockUpdate(data);
+		//		m_bufferLoadQueue.getWriteAccess()->push(
+		//			{ glm::ivec2(chunkCoords.x + 1, chunkCoords.y), chunkAdj->second });
+		//	}
+		//}
+		//data.blockCoord = localCoords;
+		//if (localCoords.z == 0)
+		//{
+		//	auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x, chunkCoords.y - 1));
+		//	if (chunkAdj != access->meshes.end())
+		//	{
+		//		data.blockCoord.z = constChunkSize;
+		//		chunkAdj->second->getWriteAccess()->notifyBlockUpdate(data);
+		//		m_bufferLoadQueue.getWriteAccess()->push(
+		//			{ glm::ivec2(chunkCoords.x, chunkCoords.y - 1), chunkAdj->second });
+		//	}
+		//}
+		//else if (localCoords.z == constChunkSize - 1)
+		//{
+		//	auto chunkAdj = access->meshes.find(glm::ivec2(chunkCoords.x, chunkCoords.y + 1));
+		//	if (chunkAdj != access->meshes.end())
+		//	{
+		//		data.blockCoord.z = -1;
+		//		chunkAdj->second->getWriteAccess()->notifyBlockUpdate(data);
+		//		m_bufferLoadQueue.getWriteAccess()->push(
+		//			{ glm::ivec2(chunkCoords.x, chunkCoords.y + 1), chunkAdj->second });
+		//	}
+		//}
 	}
 }
