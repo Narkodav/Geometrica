@@ -17,10 +17,11 @@ void World::handleInputs(Mouse& mouse, const Keyboard& keyboard, float deltaTime
 
 void World::physicsUpdate(float deltaTime)
 {
-	m_player.update(deltaTime, m_chunkManager.getChunkMap());
+	m_player.update(deltaTime, m_chunkManager.getMapQuery());
+	/*m_chunkManager.update(m_player.getChunkCoords());*/
 }
 
 void World::iterate()
 {
-	m_chunkManager.iterate(m_player.getChunkCoords());
+	m_chunkManager.updateChunkMap(m_player.getChunkCoords());
 }

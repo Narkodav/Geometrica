@@ -1,4 +1,5 @@
 #include "BlockTemplate.h"
+#include "dataManagement/DataRepository.h"
 
 std::string BlockTemplate::parseName(std::string filepath)
 {
@@ -46,4 +47,10 @@ std::string BlockTemplate::parseBlockType(const std::string& filepath)
             }
         }
     }
+}
+
+bool BlockTemplate::loadHitboxData(const std::string& hitboxName) {
+    setHitboxName(hitboxName);
+    setHitbox(&DataRepository::getHitbox(hitboxName));
+    return true;
 }

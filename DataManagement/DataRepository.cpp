@@ -112,22 +112,21 @@ void DataRepository::setHitboxes()
 	}
 }
 
-void initializeBlockFactory() {
-	BlockFactory::registerBlockType("CuboidBlock",
-		[](const std::string& filepath) {
-			auto block = std::make_unique<CuboidBlock>();
-			if (!block->loadFromFile(filepath)) {
-				return std::unique_ptr<CuboidBlock>(nullptr);
-			}
-			return block;
-		}
-	);
-	// Register other block types here
-}
+//void initializeBlockFactory() {
+//	BlockFactory::registerBlockType("CuboidBlock",
+//		[](const std::string& filepath) {
+//			auto block = std::make_unique<CuboidBlock>();
+//			if (!block->loadFromFile(filepath)) {
+//				return std::unique_ptr<CuboidBlock>(nullptr);
+//			}
+//			return block;
+//		}
+//	);
+//	// Register other block types here
+//}
 
 void DataRepository::set(std::string resourcesFilepath)
 {
-	initializeBlockFactory();
 	m_resourcesFilepath = resourcesFilepath;
 #ifdef _DEBUG
 	std::cout << m_resourcesFilepath << std::endl;

@@ -63,7 +63,7 @@ void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard)
 		if (m_raycastResult.hit)
 		{
 			m_gameContext.gameEvents.emit<GameEventTypes::BLOCK_MODIFIED>(
-				BlockModifiedEvent{ m_raycastResult.blockPos, DataRepository::airId });
+				BlockModifiedEvent{ m_raycastResult.blockPos, DataRepository::airId, nullptr });
 		}
 	}
 	else if (mouse.RMB.isChanged && mouse.RMB.state)
@@ -73,7 +73,7 @@ void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard)
 		{
 			m_gameContext.gameEvents.emit<GameEventTypes::BLOCK_MODIFIED>(
 				BlockModifiedEvent{ m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal),
-				DataRepository::getBlock("stone_upper_half")->getId() });
+				DataRepository::getBlock("water")->getId() });
 		}
 	}
 
@@ -88,7 +88,7 @@ void Player::handleMouseMove(Mouse& mouse, float delta)
 
 }
 
-void Player::update(float deltaTime, const ChunkMap& chunkMap)
+void Player::update(float deltaTime, const PhysicsManager::MapQueryInterface& chunkMap)
 {
 	m_acceleration -= m_velocity * m_friction;
 	glm::vec3 deltaPos = m_velocity * deltaTime + m_acceleration * deltaTime * deltaTime * 0.5f;

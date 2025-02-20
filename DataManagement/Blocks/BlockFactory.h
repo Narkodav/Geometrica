@@ -29,3 +29,18 @@ private:
     static inline std::unordered_map<std::string, BlockCreator> creators;
 };
 
+template<typename T>
+class BlockRegistrar {
+public:
+    BlockRegistrar(const std::string& typeName) {
+        BlockFactory::registerBlockType(typeName,
+            [](const std::string& filepath) {
+                auto block = std::make_unique<T>();
+                if (!block->loadFromFile(filepath)) {
+                    return std::unique_ptr<T>(nullptr);
+                }
+                return block;
+            }
+        );
+    }
+};

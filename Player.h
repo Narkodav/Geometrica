@@ -9,9 +9,11 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "PhysicsManager.h"
-#include "ChunkManagement/ChunkManager.h"
 #include "Utilities/Functions.h"
 #include "GameContext.h"
+#include "GameEvents.h"
+#include "Multithreading/EventSystem.h"
+#include "DataManagement/Blocks/DynamicBlockTemplate.h"
 
 class Player
 {
@@ -43,7 +45,7 @@ public:
 	void handleInputs(const Mouse& mouse, const Keyboard& keyboard);
 	void handleMouseMove(Mouse& mouse, float delta);
 
-	void update(float deltaTime, const ChunkMap& chunkMap);
+	void update(float deltaTime, const PhysicsManager::MapQueryInterface& chunkMap);
 
 	//getters
 

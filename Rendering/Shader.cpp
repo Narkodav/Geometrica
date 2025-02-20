@@ -44,8 +44,9 @@ ShaderProgramSource Shader::ParseShader(const std::string& filepath)
         }
         else ss[(int)type] << line << '\n';
     }
-    std::cout << ss[0].str() << std::endl;
-    std::cout << ss[1].str() << std::endl;
+    //std::cout << ss[0].str() << std::endl;
+    //std::cout << ss[1].str() << std::endl;
+    std::cout << "Shader source parsed" << std::endl;
     return { ss[0].str(), ss[1].str() };
 
 }
@@ -71,7 +72,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
         glDeleteShader(id);
         return 0;
     }
-
+    std::cout << "Shader compiled" << std::endl;
     return id;
 }
 

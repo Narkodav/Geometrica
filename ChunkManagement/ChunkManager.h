@@ -3,25 +3,52 @@
 #include "ChunkMap.h"
 #include "Generator.h"
 #include "GameContext.h"
+#include "PhysicsManager.h"
 
 class ChunkManager
 {
+public:
+    struct ChunkMapQuery : public MapUpdateQueryInterface,
+    public PhysicsManager::MapQueryInterface
+	{
+    private:
+        const ChunkMap& chunkMap;
+
+    public:
+
+        explicit ChunkMapQuery(const ChunkMap& map) : chunkMap(map) {}
+
+        ~ChunkMapQuery() = default;
+
+        uint32_t getBlockId(glm::ivec3 blockCoords) const override {
+            return chunkMap.getBlockId(blockCoords);
+        }
+
+        std::unique_ptr<DynamicBlockDataTemplate> getBlockData(glm::ivec3 blockCoords) const override {
+            return chunkMap.getBlockData(blockCoords);
+        }
+
+        BlockData getBlock(glm::ivec3 blockCoords) const override {
+            return chunkMap.getBlock(blockCoords);
+        }
+    };
+
 private:
 	ChunkMap m_chunkMap;
 	glm::ivec2 m_lastRecordedCoords;
-
-	MT::EventSystem<GameEventPolicy>::Subscription m_blockUpdateSubscription;
+	unsigned int m_simulationDistance;
 
 public:
 	ChunkManager(const GameContext& gameContext, Generator& generatorHandle, unsigned int m_loadDistance) :
 		m_chunkMap(m_loadDistance, generatorHandle, gameContext),
-		m_lastRecordedCoords(0, 0),
-		m_blockUpdateSubscription(gameContext.gameEvents.subscribe<GameEventTypes::BLOCK_MODIFIED>
-			([this](BlockModifiedEvent data)
-				{ m_chunkMap.changeBlock(data.blockCoord, data.blockId); })) {};
+		m_lastRecordedCoords(0, 0) {};
 
+
+    ChunkMapQuery getMapQuery() const { return ChunkMapQuery(m_chunkMap); };
 	
-	void iterate(glm::ivec2 newCoords);
+	void updateChunkMap(const glm::ivec2& coords);
+
+    void updateDynamicBlocks(const glm::ivec2& coords);
 
 	unsigned int getGeneratedAmount() { return m_chunkMap.getGeneratedAmount(); };
 

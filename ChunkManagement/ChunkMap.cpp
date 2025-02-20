@@ -4,7 +4,10 @@ ChunkMap::ChunkMap(unsigned int loadDistance, Generator& generatorHandle,
 	const GameContext& gameContext) :
 	m_loadDistance(loadDistance), m_loadingTaskCoordinator(gameContext.threadPool, gameContext.threadPool.getWorkerAmount() / 4),
 	m_unloadingTaskCoordinator(gameContext.threadPool, gameContext.threadPool.getWorkerAmount() / 4),
-	m_generator(generatorHandle), m_chunkCounter(0), m_eventSystem(gameContext.gameEvents)
+	m_generator(generatorHandle), m_chunkCounter(0), m_eventSystem(gameContext.gameEvents),
+	m_blockUpdateSubscription(gameContext.gameEvents.subscribe<GameEventTypes::BLOCK_MODIFIED>
+		([this](BlockModifiedEvent data)
+			{ this->changeBlock(data); }))
 {
 	m_loadDistanceSquaredWithCushion = pow(m_loadDistance + 0.5, 2);
 	m_chunkPool.set(pow((m_loadDistance * 2 + 1), 2) * 2);
@@ -149,10 +152,10 @@ void ChunkMap::decoupleChunks(MT::Synchronized<ChunkMapData>::WriteAccess& mapAc
 	}
 }
 
-void ChunkMap::changeBlock(glm::ivec3 blockCoords, unsigned int blockId)
+void ChunkMap::changeBlock(const BlockModifiedEvent& blockModification)
 {
-	glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockCoords, constChunkSize);
-	glm::ivec3 localCoords = Utils::globalToLocal(blockCoords, constChunkSize);
+	glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockModification.blockCoord, constChunkSize);
+	glm::ivec3 localCoords = Utils::globalToLocal(blockModification.blockCoord, constChunkSize);
 	if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
 		return;
 	auto access = m_mapData.getWriteAccess();
@@ -164,16 +167,16 @@ void ChunkMap::changeBlock(glm::ivec3 blockCoords, unsigned int blockId)
 		unsigned int previousId;
 		{
 			auto chunkAccess = chunk->second.getCenter()->getWriteAccess();
-			previousId = chunkAccess.data.getBlock(localCoords.y, localCoords.x, localCoords.z);
-			chunkAccess.data.setBlock(localCoords.y, localCoords.x, localCoords.z, blockId);
+			previousId = chunkAccess.data.getBlockId(localCoords.y, localCoords.x, localCoords.z);
+			chunkAccess.data.setBlock(localCoords.y, localCoords.x, localCoords.z, blockModification.blockId);
 		}
 		coupleChunks(access, chunk->second, chunkCoords);
 		m_eventSystem.emit<GameEventTypes::BLOCK_REMESH>(
-			BlockRemeshEvent{ blockCoords, blockId, previousId });
+			BlockRemeshEvent{ blockModification.blockCoord, blockModification.blockId, previousId });
 
 		for (int i = 0; i < constDirectionVectors3DHashed.size(); i++)
 		{
-			glm::ivec3 adjCoord = blockCoords + constDirectionVectors3DHashed[i];
+			glm::ivec3 adjCoord = blockModification.blockCoord + constDirectionVectors3DHashed[i];
 			unsigned int currentId = getBlockId(adjCoord, access);
 			m_eventSystem.emit<GameEventTypes::BLOCK_REMESH>(
 				BlockRemeshEvent{ adjCoord, currentId, currentId });

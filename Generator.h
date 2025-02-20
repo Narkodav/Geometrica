@@ -7,7 +7,7 @@
 
 #include "platformCommon.h"
 #include "ChunkManagement/ChunkData.h"
-#include "DataManagement/dataRepository.h"
+#include "DataManagement/DataRepository.h"
 #include "Mathematics/PerlinNoise2d.h"
 #include "Mathematics/PerlinNoise3d.h"
 

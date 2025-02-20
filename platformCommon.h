@@ -44,7 +44,7 @@ const std::array<glm::ivec2, 4> constDirectionVectors2DHashed =
 	glm::ivec2( 0, -1),		// left / west
 };
 
-const std::array<glm::ivec3, 7> constDirectionVectors3DHashed =
+const std::array<glm::ivec3, 6> constDirectionVectors3DHashed =
 {
 	glm::ivec3( 1,  0,  0),		// front / south
 	glm::ivec3( 0,  0,  1),		// right / east
@@ -52,10 +52,9 @@ const std::array<glm::ivec3, 7> constDirectionVectors3DHashed =
 	glm::ivec3(-1,  0,  0),		// back / north
 	glm::ivec3( 0,  0, -1),		// left / west
 	glm::ivec3( 0, -1,  0),		// down
-	glm::ivec3( 0,  0,  0),		// none (for utility)
 };
 
-const std::array<glm::ivec3, 7> constDirectionVectors3DOppositeHashed =
+const std::array<glm::ivec3, 6> constDirectionVectors3DOppositeHashed =
 {
 	glm::ivec3(-1,  0,  0),		// back / north
 	glm::ivec3(0,  0, -1),		// left / west
@@ -63,7 +62,6 @@ const std::array<glm::ivec3, 7> constDirectionVectors3DOppositeHashed =
 	glm::ivec3(1,  0,  0),		// front / south
 	glm::ivec3(0,  0,  1),		// right / east
 	glm::ivec3(0,  1,  0),		// up 
-	glm::ivec3(0,  0,  0),		// none (for utility)
 };
 
 enum class Directions3DHashed : unsigned int
@@ -220,8 +218,8 @@ struct Area
 
 enum class BlockMesherType
 {
-	MESHING_CUBOID = 0,			//for block types using cuboid models
-	//MESHING_LIQUID,			//for block types that are liquid derived
+	MESHING_CUBOID = 0,		//for block types using cuboid models
+	MESHING_LIQUID,			//for block types that are liquid derived
 	//MESHING_COMPLICATED,	//for block types that use complicated models (non cuboid models like spheres) WARNING! can affect performance
 	//MESHING_TRANSPARENT,	//for transparent block types like glass
 	//MESHING_TRANSLUCENT,	//for translucent block types like tinted glass

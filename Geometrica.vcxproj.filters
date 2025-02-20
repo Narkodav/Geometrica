@@ -153,16 +153,28 @@
     <ClInclude Include="Vendor\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataManagement\CuboidBlock.h">
+    <ClInclude Include="DataManagement\Blocks\CuboidBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataManagement\BlockTemplate.h">
+    <ClInclude Include="DataManagement\Blocks\BlockTemplate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataManagement\BlockFactory.h">
+    <ClInclude Include="DataManagement\Blocks\BlockFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Meshing\MesherTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Meshing\LiquidMesher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManagement\Blocks\LiquidBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManagement\Blocks\DynamicBlockTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManagement\Blocks\DynamicBlockDataFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -299,17 +311,40 @@
     <ClCompile Include="Vendor\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DataManagement\CuboidBlock.cpp">
+    <ClCompile Include="DataManagement\Blocks\CuboidBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DataManagement\BlockTemplate.cpp">
+    <ClCompile Include="DataManagement\Blocks\BlockTemplate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DataManagement\BlockFactory.cpp">
+    <ClCompile Include="DataManagement\Blocks\BlockFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Meshing\MesherTemplate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\Meshing\LiquidMesher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManagement\Blocks\LiquidBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManagement\Blocks\DynamicBlockTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManagement\Blocks\DynamicBlockDataFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\liquid.shader" />
+    <None Include="shaders\to_screen_flat.shader" />
+    <None Include="shaders\model_phong.shader" />
+    <None Include="shaders\skybox.shader" />
+    <None Include="shaders\light_source.shader" />
+    <None Include="shaders\FlatToScreen.shader" />
+    <None Include="shaders\cuboidFace.shader" />
+    <None Include="shaders\blockHighlight.shader" />
+    <None Include="shaders\block.shader" />
   </ItemGroup>
 </Project>

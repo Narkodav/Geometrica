@@ -2,7 +2,6 @@
 
 void CuboidMesher::removeData(const glm::ivec3& blockCoord, Chunk::ReadAccess* access /*= nullptr*/)
 {
-	if (!access) throw std::runtime_error("Chunk access required");
 	auto data = m_coordToCuboidMap.find(blockCoord);
 	if (data == m_coordToCuboidMap.end())
 		return;
@@ -16,7 +15,8 @@ void CuboidMesher::addData(const glm::ivec3& blockCoords, const unsigned int& id
 	if (!access) throw std::runtime_error("Chunk access required");
 
 	const std::unique_ptr<BlockTemplate>& baseBlock = DataRepository::getBlock(id);
-	const CuboidBlock* block = dynamic_cast<CuboidBlock*>(baseBlock.get());
+	const CuboidBlock* block = static_cast<CuboidBlock*>(baseBlock.get());
+	assert(block->getMesherType() == mesherType && "Block type mismatch in CuboidMesher!");
 
 	BlockData blockData;
 	glm::ivec2 chunkCoords = access->data.getCoords();
@@ -34,8 +34,8 @@ void CuboidMesher::addData(const glm::ivec3& blockCoords, const unsigned int& id
 	);
 	for (int i = 0; i < 6; i++)
 	{
-		const glm::vec3 adjPosition = blockCoords + constDirectionVectors3DHashed[i];
-		const auto& adjId = access->data.getBlock(adjPosition.y, adjPosition.x, adjPosition.z);
+		const glm::ivec3 adjPosition = blockCoords + constDirectionVectors3DHashed[i];
+		const auto& adjId = access->data.getBlockId(adjPosition.y, adjPosition.x, adjPosition.z);
 		std::vector<FaceDrawData> data;
 
 		if (adjId == DataRepository::airId) {
@@ -44,12 +44,23 @@ void CuboidMesher::addData(const glm::ivec3& blockCoords, const unsigned int& id
 				static_cast<FaceRotations>(i),
 				block->getMaterialAtlasIndex(i)
 			);
+
+			for (int j = 0; j < data.size(); j++)
+			{
+				blockData.atlasIndices.push_back(data[j].atlasIndex);
+				blockData.rotationIndices.push_back(data[j].rotationIndex);
+				blockData.dimensions.push_back(data[j].dimensions);
+				blockData.positions.push_back(data[j].position + worldOffset);
+			}
+			continue;
 		}
-		else if (DataRepository::getBlock(adjId)->getMesherType() == mesherType) {
+
+		const auto& adjBlock = DataRepository::getBlock(adjId);
+
+		if (adjBlock->getMesherType() == mesherType) {
 			// If adjacent block exists and has same mesher type, get face data considering both blocks
-			const auto& adjBlock = DataRepository::getBlock(adjId);
 			data = block->getCuboid().getFaceDrawData(
-				dynamic_cast<CuboidBlock*>(adjBlock.get())->getCuboid(),
+				static_cast<CuboidBlock*>(adjBlock.get())->getCuboid(),
 				constDirectionVectors3DHashed[i],
 				static_cast<FaceRotations>(i),
 				block->getMaterialAtlasIndex(i)
@@ -81,72 +92,6 @@ void CuboidMesher::addData(const glm::ivec3& blockCoords, const unsigned int& id
 		m_needsRebuild = true;
 	}
 }
-
-//void CuboidMesher::replaceData(const BlockRemeshEvent& data, Chunk::ReadAccess* access = nullptr)
-//{
-//	if (data.currentId == data.previousId)
-//		return;
-//	/*const std::unique_ptr<BlockTemplate>& block = DataRepository::getBlock(data.previousId);*/
-//	/*removeData(data.blockCoord, access);*/
-//
-//	else if (data.previousId == DataRepository::airId)
-//	{
-//		glm::ivec3 adj;
-//		for (int i = 0; i < 6; i++)
-//		{
-//			adj = data.blockCoord + constDirectionVectors3DHashed[i];
-//			if (adj.x < 0 || adj.x >= constChunkSize ||
-//				adj.y < 0 || adj.y >= constWorldHeight ||
-//				adj.z < 0 || adj.z >= constChunkSize)
-//			{
-//				continue; // Skip this iteration if out of bounds
-//			}
-//
-//			unsigned int id = access.data.getBlock(adj.y, adj.x, adj.z);
-//			if (DataRepository::hasCuboidModel(id))
-//			{
-//				m_cuboidMeshData.removeCuboidData(adj);
-//				addCuboid(glm::ivec3(adj.x, adj.y, adj.z), id, access);
-//			}
-//		}
-//		if (data.blockCoord.x < 0 || data.blockCoord.x >= constChunkSize ||
-//			data.blockCoord.y < 0 || data.blockCoord.y >= constWorldHeight ||
-//			data.blockCoord.z < 0 || data.blockCoord.z >= constChunkSize)
-//			return;
-//			addCuboid(glm::ivec3(data.blockCoord.x, data.blockCoord.y, data.blockCoord.z), data.currentId, access);
-//	}
-//	else if (data.currentId == DataRepository::airId)
-//	{
-//		m_cuboidMeshData.removeCuboidData(data.blockCoord);
-//		glm::ivec3 adj;
-//		for (int i = 0; i < 6; i++)
-//		{
-//			adj = data.blockCoord + constDirectionVectors3DHashed[i];
-//			if (adj.x < 0 || adj.x >= constChunkSize ||
-//				adj.y < 0 || adj.y >= constWorldHeight ||
-//				adj.z < 0 || adj.z >= constChunkSize)
-//				continue; // Skip this iteration if out of bounds
-//
-//			unsigned int id = access.data.getBlock(adj.y, adj.x, adj.z);
-//			if (DataRepository::hasCuboidModel(id))
-//			{
-//				m_cuboidMeshData.removeCuboidData(adj);
-//				addCuboid(glm::ivec3(adj.x, adj.y, adj.z), id, access);
-//			}
-//		}
-//	}
-//	else
-//	{
-//		if (data.blockCoord.x < 0 || data.blockCoord.x >= constChunkSize ||
-//			data.blockCoord.y < 0 || data.blockCoord.y >= constWorldHeight ||
-//			data.blockCoord.z < 0 || data.blockCoord.z >= constChunkSize)
-//			return;
-//		m_cuboidMeshData.removeCuboidData(data.blockCoord);
-//		addCuboid(glm::ivec3(data.blockCoord.x, data.blockCoord.y, data.blockCoord.z), data.currentId, access);
-//	}
-//
-//
-//}
 
 void CuboidMesher::buildBuffers()
 {

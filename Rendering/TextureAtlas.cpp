@@ -55,37 +55,98 @@ void TextureAtlas::createPixelData()
 			__debugbreak();
 		}
 
-		std::vector<int> averageColor(m_bpp, 0);
-
-		//filling padding
-		for (int i = 0; i < sourceHeight * sourceWidth; i++)
-		{
-			for (int j = 0; j < m_bpp; j++)
-				averageColor[j] += localBuffer[i * m_bpp + j];
-
-		}
-
-		for (int j = 0; j < m_bpp; j++)
-			averageColor[j] /= sourceHeight * sourceWidth;
-
-		for (int y = -m_paddingWidth; y < sourceHeight + m_paddingWidth; y++)
-			for (int x = -m_paddingWidth; x < sourceWidth + m_paddingWidth; x++)
-			{
-				atlasIndex = ((buffer.upperLeft.y + y) * m_width + buffer.upperLeft.x + x) * m_bpp;
-				for (int j = 0; j < m_bpp; j++)
-					m_pixelData[atlasIndex + j] = averageColor[j];
-			}
-
-		//filling data
+		// First copy the main texture data
 		for (int y = 0; y < sourceHeight; y++)
 		{
 			atlasIndex = ((buffer.upperLeft.y + y) * m_width + buffer.upperLeft.x) * m_bpp;
 			bufferIndex = y * sourceWidth * m_bpp;
 			std::memcpy(&m_pixelData[atlasIndex], &localBuffer[bufferIndex], sourceWidth * m_bpp);
 		}
+
+		// Fill padding by extending edge pixels
+		for (int y = -m_paddingWidth; y < sourceHeight + m_paddingWidth; y++)
+		{
+			for (int x = -m_paddingWidth; x < sourceWidth + m_paddingWidth; x++)
+			{
+				// Calculate the position in the atlas
+				atlasIndex = ((buffer.upperLeft.y + y) * m_width + buffer.upperLeft.x + x) * m_bpp;
+
+				// Calculate the source pixel coordinates (clamped to edges)
+				int sourceX = std::clamp(x, 0, sourceWidth - 1);
+				int sourceY = std::clamp(y, 0, sourceHeight - 1);
+
+				// Only fill if we're in the padding area
+				if (x < 0 || x >= sourceWidth || y < 0 || y >= sourceHeight)
+				{
+					// Get the color from the nearest edge pixel
+					bufferIndex = (sourceY * sourceWidth + sourceX) * m_bpp;
+					for (int j = 0; j < m_bpp; j++)
+					{
+						m_pixelData[atlasIndex + j] = localBuffer[bufferIndex + j];
+					}
+				}
+			}
+		}
+
 		stbi_image_free(localBuffer);
 	}
 }
+
+//void TextureAtlas::createPixelData()
+//{
+//	uint8_t* localBuffer;
+//	int sourceHeight, sourceWidth, bppBuffer;
+//	AtlasLocation buffer;
+//	size_t atlasIndex;
+//	size_t bufferIndex;
+//
+//	m_pixelData.resize(m_width * m_height * m_bpp);
+//	m_pixelData.assign(m_pixelData.size(), 0);
+//
+//	for (int i = 0; i < m_filepaths.size(); i++)
+//	{
+//		localBuffer = stbi_load(m_filepaths[i].c_str(), &sourceWidth, &sourceHeight, &bppBuffer, m_bpp);
+//		if (!localBuffer)
+//			__debugbreak();
+//
+//		buffer = m_locations.find(m_names[i])->second;
+//		if (buffer.upperLeft.x + sourceWidth > m_width || buffer.upperLeft.y + sourceHeight > m_height) {
+//			std::cerr << "Texture doesn't fit in atlas: " << m_filepaths[i] << std::endl;
+//			stbi_image_free(localBuffer);
+//			__debugbreak();
+//		}
+//
+//		std::vector<int> averageColor(m_bpp, 0);
+//
+//		//filling padding
+//		for (int i = 0; i < sourceHeight * sourceWidth; i++)
+//		{
+//			for (int j = 0; j < m_bpp; j++)
+//				averageColor[j] += localBuffer[i * m_bpp + j];
+//
+//		}
+//
+//		for (int j = 0; j < m_bpp; j++)
+//			averageColor[j] /= sourceHeight * sourceWidth;
+//
+//		for (int y = -m_paddingWidth; y < sourceHeight + m_paddingWidth; y++)
+//			for (int x = -m_paddingWidth; x < sourceWidth + m_paddingWidth; x++)
+//			{
+//				atlasIndex = ((buffer.upperLeft.y + y) * m_width + buffer.upperLeft.x + x) * m_bpp;
+//				for (int j = 0; j < m_bpp; j++)
+//					m_pixelData[atlasIndex + j] = averageColor[j];
+//			}
+//
+//		//filling data
+//		for (int y = 0; y < sourceHeight; y++)
+//		{
+//			atlasIndex = ((buffer.upperLeft.y + y) * m_width + buffer.upperLeft.x) * m_bpp;
+//			bufferIndex = y * sourceWidth * m_bpp;
+//			std::memcpy(&m_pixelData[atlasIndex], &localBuffer[bufferIndex], sourceWidth * m_bpp);
+//		}
+//		stbi_image_free(localBuffer);
+//	}
+//}
 
 void TextureAtlas::unpackBin(const Utils::BinPacker::Bin& bin)
 {
@@ -106,6 +167,9 @@ void TextureAtlas::unpackBin(const Utils::BinPacker::Bin& bin)
 	m_width = maxWidth;
 	m_height = maxHeight;
 
+	// Add a small inset to prevent bleeding
+	float pixelInset = 0.f;  // Adjust this value if needed
+
 	for (auto& location : m_locations)
 	{
 		location.second.upperLeft.x += m_paddingWidth;
@@ -113,10 +177,13 @@ void TextureAtlas::unpackBin(const Utils::BinPacker::Bin& bin)
 		location.second.width -= m_paddingWidth * 2;
 		location.second.height -= m_paddingWidth * 2;
 
-		location.second.transforms.uScale = location.second.width / static_cast<float>(m_width);
-		location.second.transforms.vScale = location.second.height / static_cast<float>(m_height);
-		location.second.transforms.uOffset = location.second.upperLeft.x / static_cast<float>(m_width);
-		location.second.transforms.vOffset = location.second.upperLeft.y / static_cast<float>(m_height);
+		float uInset = pixelInset / static_cast<float>(m_width);
+		float vInset = pixelInset / static_cast<float>(m_height);
+
+		location.second.transforms.uScale = (location.second.width - 2 * pixelInset) / static_cast<float>(m_width);
+		location.second.transforms.vScale = (location.second.height - 2 * pixelInset) / static_cast<float>(m_height);
+		location.second.transforms.uOffset = (location.second.upperLeft.x + pixelInset) / static_cast<float>(m_width);
+		location.second.transforms.vOffset = (location.second.upperLeft.y + pixelInset) / static_cast<float>(m_height);
 	}
 }
 
@@ -149,7 +216,7 @@ void TextureAtlas::setAtlas()
 	glGenTextures(1, &m_id);
 	glBindTexture(GL_TEXTURE_2D, m_id);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

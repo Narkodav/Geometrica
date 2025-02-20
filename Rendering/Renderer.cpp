@@ -82,29 +82,29 @@ void Renderer::setForThread(unsigned int parameters, int renderDistance, float a
 
     if (parameters & DEPTH_TESTING)
     {
-        m_flags[FLAG_DEPTH_TESTING] = 1;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_DEPTH_TESTING)] = 1;
         glEnable(GL_DEPTH_TEST);
     }
-    else m_flags[FLAG_DEPTH_TESTING] = 0;
+    else m_flags[static_cast<size_t>(RenderFlags::FLAG_DEPTH_TESTING)] = 0;
     if (parameters & FACE_CULLING)
     {
-        m_flags[FLAG_FACE_CULLING] = 1;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_FACE_CULLING)] = 1;
         glEnable(GL_CULL_FACE);
     }
-    else m_flags[FLAG_FACE_CULLING] = 0;
+    else m_flags[static_cast<size_t>(RenderFlags::FLAG_FACE_CULLING)] = 0;
     if (parameters & BLENDING)
     {
-        m_flags[FLAG_BLENDING] = 1;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_BLENDING)] = 1;
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
-    else m_flags[FLAG_BLENDING] = 0;
-
-    m_shaders[SHADER_CUBOID].set("shaders/cuboidFace.shader");
-    m_shaders[SHADER_BLOCK].set("shaders/block.shader");
-    m_shaders[SHADER_BLOCK_HIGHLIGHT].set("shaders/blockHighlight.shader");
-    m_shaders[SHADER_SKYBOX].set("shaders/skybox.shader");
-    m_shaders[SHADER_FLAT_TO_SCREEN].set("shaders/FlatToScreen.shader");
+    else m_flags[static_cast<size_t>(RenderFlags::FLAG_BLENDING)] = 0;
+    
+    m_shaders[static_cast<size_t>(Shaders::SHADER_CUBOID)].set("shaders/cuboidFace.shader");
+    m_shaders[static_cast<size_t>(Shaders::SHADER_LIQUID)].set("shaders/liquid.shader");
+    m_shaders[static_cast<size_t>(Shaders::SHADER_BLOCK_HIGHLIGHT)].set("shaders/blockHighlight.shader");
+    m_shaders[static_cast<size_t>(Shaders::SHADER_SKYBOX)].set("shaders/skybox.shader");
+    m_shaders[static_cast<size_t>(Shaders::SHADER_FLAT_TO_SCREEN)].set("shaders/FlatToScreen.shader");
 
     debugBillboard.set();
     m_mesh.emplace(m_renderDistance, m_gameContext, *chunkMapHandle);
@@ -122,44 +122,44 @@ void Renderer::set(unsigned int parameters, int renderDistance, float aspectRati
 
 void Renderer::toggleDepthTest()
 {
-    if (m_flags[FLAG_DEPTH_TESTING])
+    if (m_flags[static_cast<size_t>(RenderFlags::FLAG_DEPTH_TESTING)])
     {
         glDisable(GL_DEPTH_TEST);
-        m_flags[FLAG_DEPTH_TESTING] = 0;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_DEPTH_TESTING)] = 0;
     }
     else
     {
         glEnable(GL_DEPTH_TEST);
-        m_flags[FLAG_DEPTH_TESTING] = 1;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_DEPTH_TESTING)] = 1;
     }
 }
 
 void Renderer::toggleFaceCulling()
 {
-    if (m_flags[FLAG_FACE_CULLING])
+    if (m_flags[static_cast<size_t>(RenderFlags::FLAG_FACE_CULLING)])
     {
         glDisable(GL_CULL_FACE);
-        m_flags[FLAG_FACE_CULLING] = 0;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_FACE_CULLING)] = 0;
     }
     else
     {
         glEnable(GL_CULL_FACE);
-        m_flags[FLAG_FACE_CULLING] = 1;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_FACE_CULLING)] = 1;
     }
 }
 
 void Renderer::toggleBlending()
 {
-    if (m_flags[FLAG_BLENDING])
+    if (m_flags[static_cast<size_t>(RenderFlags::FLAG_BLENDING)])
     {
         glDisable(GL_BLEND);
-        m_flags[FLAG_BLENDING] = 0;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_BLENDING)] = 0;
     }
     else
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        m_flags[FLAG_BLENDING] = 1;
+        m_flags[static_cast<size_t>(RenderFlags::FLAG_BLENDING)] = 1;
     }
 }
 
@@ -177,7 +177,7 @@ void Renderer::setProjection(float aspectRatio, float fov)
 
 void Renderer::clear() const
 {
-    if(m_flags[FLAG_DEPTH_TESTING])
+    if(m_flags[static_cast<size_t>(RenderFlags::FLAG_DEPTH_TESTING)])
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     else glClear(GL_COLOR_BUFFER_BIT);
     
@@ -200,11 +200,12 @@ void Renderer::render(RenderParams params)
     glm::vec3 futurePos = currentPos + params.velocity * delta + params.acceleration * delta * delta * 0.5f;
     glm::vec3 interpolatedDelta = params.alpha * (futurePos - currentPos);
     params.interpolatedView = glm::translate(params.interpolatedView, -interpolatedDelta);
-    m_mesh.value().drawSkybox(m_shaders[SHADER_SKYBOX], params.viewWithoutTranspos, m_projection );
-    m_mesh.value().drawChunks(m_shaders[SHADER_CUBOID], m_shaders[SHADER_BLOCK], params.interpolatedView, m_projection);
-    m_mesh.value().drawBlockHighlight(m_shaders[SHADER_BLOCK_HIGHLIGHT], params.interpolatedView, m_projection, params.selectedArea);
-    
 
+    m_mesh.value().drawSkybox(m_shaders[static_cast<size_t>(Shaders::SHADER_SKYBOX)], params.viewWithoutTranspos, m_projection );
+    m_mesh.value().drawChunks(m_shaders[static_cast<size_t>(Shaders::SHADER_CUBOID)], 
+    m_shaders[static_cast<size_t>(Shaders::SHADER_LIQUID)], params.interpolatedView, m_projection);
+    m_mesh.value().drawBlockHighlight(m_shaders[static_cast<size_t>(Shaders::SHADER_BLOCK_HIGHLIGHT)],
+        params.interpolatedView, m_projection, params.selectedArea);
 }
 
 void Renderer::debugRender()
@@ -365,7 +366,7 @@ void Renderer::displayChunkOverlay(RenderParams params)
         // Adjust triangle size to be proportional to tile size
         float halfTile = TILE_SIZE / 2;
 
-        // North
+        // South
         if (region->second.getAdj(Directions2DHashed::DIRECTION_BACKWARD) != nullptr) {
             draw_list->AddTriangleFilled(
                 ImVec2(tilePos.x, tilePos.y),
@@ -374,7 +375,7 @@ void Renderer::displayChunkOverlay(RenderParams params)
                 triangleColor
             );
         }
-        // South
+        // North
         if (region->second.getAdj(Directions2DHashed::DIRECTION_FORWARD) != nullptr) {
             draw_list->AddTriangleFilled(
                 ImVec2(tilePos.x, tilePos.y + TILE_SIZE - gap),

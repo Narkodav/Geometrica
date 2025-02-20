@@ -1,7 +1,12 @@
 #include "ChunkManager.h"
 
-void ChunkManager::iterate(glm::ivec2 newCoords)
+void ChunkManager::updateChunkMap(const glm::ivec2& coords)
 {
-	m_chunkMap.iterate(newCoords);
-	m_lastRecordedCoords = newCoords;
+	m_chunkMap.iterate(coords);
+	m_lastRecordedCoords = coords;
+}
+
+void ChunkManager::updateDynamicBlocks(const glm::ivec2& coords)
+{
+
 }

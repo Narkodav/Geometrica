@@ -129,7 +129,7 @@ public:
 
 	void processBuffers();
 
-	void drawChunks(Shader& shaderCuboid, Shader& shaderBlock, glm::mat4 view, glm::mat4 projection);
+	void drawChunks(Shader& shaderCuboid, Shader& shaderLiquid, glm::mat4 view, glm::mat4 projection);
 	void drawSkybox(Shader& shader, glm::mat4 viewWithoutTranspos, glm::mat4 projection);
 	void drawBlockHighlight(Shader& shader, glm::mat4 view, glm::mat4 projection, Area selectedArea);
 

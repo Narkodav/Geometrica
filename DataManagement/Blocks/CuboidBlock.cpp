@@ -1,5 +1,5 @@
 #include "CuboidBlock.h"
-#include "DataRepository.h"
+#include "dataManagement/DataRepository.h"
 
 //Cuboid block file structure:
 //#Block type --type-- //type matches class name
@@ -15,8 +15,6 @@ bool CuboidBlock::loadFromFile(const std::string & filepath) {
         return false;
     }
     setName(parseName(filepath));
-    setType("CuboidBlock");
-    setMesherType(BlockMesherType::MESHING_CUBOID);
 
     std::string line;
     std::string type, id, cuboidName, hitboxName;
@@ -95,12 +93,6 @@ bool CuboidBlock::loadFromFile(const std::string & filepath) {
 bool CuboidBlock::loadCuboidData(const std::string& cuboidName) {
     m_cuboidName = cuboidName;
     m_cuboidHandle = &DataRepository::getCuboid(m_cuboidName);
-    return true;
-}
-
-bool CuboidBlock::loadHitboxData(const std::string& hitboxName) {
-    m_hitboxName = hitboxName;
-    m_hitboxHandle = &DataRepository::getHitbox(hitboxName);
     return true;
 }
 

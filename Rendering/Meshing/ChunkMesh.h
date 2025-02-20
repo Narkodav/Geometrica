@@ -18,6 +18,7 @@
 #include "platformCommon.h"
 #include "GameEvents.h"
 #include "CuboidMesher.h"
+#include "LiquidMesher.h"
 
 class ChunkMesh //coords are YXZ for transferring layer by layer
 {

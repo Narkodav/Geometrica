@@ -3,3 +3,4 @@ grass_block_top
 dirt
 stone
 highlight_texture
+water

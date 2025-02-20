@@ -13,7 +13,7 @@
 #include "MultiThreading/MemoryPool.h"
 #include "MultiThreading/Synchronized.h"
 
-#include "ChunkManagementQueue.h"
+//#include "ChunkManagementQueue.h"
 #include "Utilities/Functions.h"
 #include "ChunkRegion.h"
 
@@ -65,6 +65,7 @@ private:
 	MT::TaskCoordinator m_unloadingTaskCoordinator;
 	Generator& m_generator;
 	MT::EventSystem<GameEventPolicy>& m_eventSystem;
+	MT::EventSystem<GameEventPolicy>::Subscription m_blockUpdateSubscription;
 
 	MT::Synchronized<ChunkMapData> m_mapData;
 
@@ -75,8 +76,9 @@ private:
 	std::vector<glm::ivec2> m_loadArea; //sorted by distance from center
 
 public:
-	ChunkMap(unsigned int loadDistance, Generator& generator, 
+	ChunkMap(unsigned int loadDistance, Generator& generator,
 		const GameContext& gameContext);
+
 	~ChunkMap() {
 		MT::ThreadPool& handle = m_loadingTaskCoordinator.getPoolHandle();
 		while (handle.queueSize());
@@ -109,7 +111,7 @@ public:
 	unsigned int getAreaAmount() const { return  m_loadArea.size(); };
 	bool isFullyGenerated() const { return m_chunkCounter.load() == m_loadArea.size(); };
 
-	unsigned int getBlockId(glm::ivec3 blockCoords) const {
+	uint32_t getBlockId(glm::ivec3 blockCoords) const {
 		glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockCoords, constChunkSize);
 		glm::ivec3 localCoords = Utils::globalToLocal(blockCoords, constChunkSize);
 		if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
@@ -117,23 +119,60 @@ public:
 		auto access = m_mapData.getReadAccess();
 		auto chunk = access->regions.find(chunkCoords);
 		if (chunk != access->regions.end())
-			return chunk->second.getCenter()->getReadAccess().data.getBlock(localCoords.y, localCoords.x, localCoords.z);
+			return chunk->second.getCenter()->getReadAccess().data.getBlockId(localCoords.y, localCoords.x, localCoords.z);
 		return 0;
 	};
 
-	unsigned int getBlockId(glm::ivec3 blockCoords, const MT::Synchronized<ChunkMapData>::WriteAccess& access) const {
+	uint32_t getBlockId(glm::ivec3 blockCoords, const MT::Synchronized<ChunkMapData>::WriteAccess& access) const {
 		glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockCoords, constChunkSize);
 		glm::ivec3 localCoords = Utils::globalToLocal(blockCoords, constChunkSize);
 		if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
 			return DataRepository::airId;
 		auto chunk = access->regions.find(chunkCoords);
 		if (chunk != access->regions.end())
-			return chunk->second.getCenter()->getReadAccess().data.getBlock(localCoords.y, localCoords.x, localCoords.z);
+			return chunk->second.getCenter()->getReadAccess().data.getBlockId(localCoords.y, localCoords.x, localCoords.z);
 		return 0;
+	};
+
+	uint32_t getBlockId(glm::ivec3 blockCoords, const MT::Synchronized<ChunkMapData>::ReadAccess& access) const {
+		glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockCoords, constChunkSize);
+		glm::ivec3 localCoords = Utils::globalToLocal(blockCoords, constChunkSize);
+		if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
+			return DataRepository::airId;
+		auto chunk = access->regions.find(chunkCoords);
+		if (chunk != access->regions.end())
+			return chunk->second.getCenter()->getReadAccess().data.getBlockId(localCoords.y, localCoords.x, localCoords.z);
+		return 0;
+	};
+
+	std::unique_ptr<DynamicBlockDataTemplate> getBlockData(glm::ivec3 blockCoords) const {
+		glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockCoords, constChunkSize);
+		glm::ivec3 localCoords = Utils::globalToLocal(blockCoords, constChunkSize);
+		if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
+			return nullptr;
+		auto access = m_mapData.getReadAccess();
+		auto chunk = access->regions.find(chunkCoords);
+		if (chunk != access->regions.end())
+			return std::move(chunk->second.getCenter()->getReadAccess().data.getBlockData(
+				localCoords.y, localCoords.x, localCoords.z));
+		return nullptr;
+	};
+
+	BlockData getBlock(glm::ivec3 blockCoords) const {
+		glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockCoords, constChunkSize);
+		glm::ivec3 localCoords = Utils::globalToLocal(blockCoords, constChunkSize);
+		if (localCoords.y < 0 || localCoords.y >= constWorldHeight)
+			return{ DataRepository::airId, nullptr };
+		auto access = m_mapData.getReadAccess();
+		auto chunk = access->regions.find(chunkCoords);
+		if (chunk != access->regions.end())
+			return chunk->second.getCenter()->getReadAccess().data.getBlock(localCoords.y, localCoords.x, localCoords.z);
+		return{ DataRepository::airId, nullptr };
 	};
 
 	auto getMapDataAccess() const { return m_mapData.getReadAccess(); };
 
-	void changeBlock(glm::ivec3 blockCoords, unsigned int blockId);
+private:
+	void changeBlock(const BlockModifiedEvent& blockModification); //use the event system
 };
 

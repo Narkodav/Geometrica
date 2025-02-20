@@ -42,7 +42,7 @@ private:
 
 	std::vector<uint8_t> m_pixelData;
 	const int m_bpp = 4; //RGBA
-	const int m_paddingWidth = 8; //border around a texture
+	const int m_paddingWidth = 30; //border around a texture
 	unsigned int m_width;
 	unsigned int m_height;
 

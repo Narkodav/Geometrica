@@ -139,9 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DataManagement\BlockFactory.h" />
-    <ClInclude Include="DataManagement\BlockTemplate.h" />
-    <ClInclude Include="DataManagement\CuboidBlock.h" />
+    <ClInclude Include="DataManagement\Blocks\DynamicBlockTemplate.h" />
+    <ClInclude Include="DataManagement\Blocks\BlockFactory.h" />
+    <ClInclude Include="DataManagement\Blocks\BlockTemplate.h" />
+    <ClInclude Include="DataManagement\Blocks\CuboidBlock.h" />
     <ClInclude Include="ChunkManagement\Chunk.h" />
     <ClInclude Include="ChunkManagement\ChunkData.h" />
     <ClInclude Include="ChunkManagement\ChunkManager.h" />
@@ -150,11 +151,14 @@
     <ClInclude Include="ChunkManagement\ChunkRegionData.h" />
     <ClInclude Include="DataManagement\Cuboid.h" />
     <ClInclude Include="DataManagement\DataRepository.h" />
+    <ClInclude Include="DataManagement\Blocks\DynamicBlockDataFactory.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="GameEvents.h" />
     <ClInclude Include="Generator.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="DataManagement\Blocks\LiquidBlock.h" />
+    <ClInclude Include="Rendering\Meshing\LiquidMesher.h" />
     <ClInclude Include="logger\ChunkProcessingProfiler.h" />
     <ClInclude Include="logger\GlobalParamsLogger.h" />
     <ClInclude Include="Rendering\Meshing\MesherTemplate.h" />
@@ -191,9 +195,10 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DataManagement\BlockFactory.cpp" />
-    <ClCompile Include="DataManagement\BlockTemplate.cpp" />
-    <ClCompile Include="DataManagement\CuboidBlock.cpp" />
+    <ClCompile Include="DataManagement\Blocks\DynamicBlockTemplate.cpp" />
+    <ClCompile Include="DataManagement\Blocks\BlockFactory.cpp" />
+    <ClCompile Include="DataManagement\Blocks\BlockTemplate.cpp" />
+    <ClCompile Include="DataManagement\Blocks\CuboidBlock.cpp" />
     <ClCompile Include="ChunkManagement\Chunk.cpp" />
     <ClCompile Include="ChunkManagement\ChunkData.cpp" />
     <ClCompile Include="ChunkManagement\ChunkManager.cpp" />
@@ -202,11 +207,14 @@
     <ClCompile Include="ChunkManagement\ChunkRegionData.cpp" />
     <ClCompile Include="DataManagement\Cuboid.cpp" />
     <ClCompile Include="DataManagement\DataRepository.cpp" />
+    <ClCompile Include="DataManagement\Blocks\DynamicBlockDataFactory.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="GameEvents.cpp" />
     <ClCompile Include="Generator.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="DataManagement\Blocks\LiquidBlock.cpp" />
+    <ClCompile Include="Rendering\Meshing\LiquidMesher.cpp" />
     <ClCompile Include="logger\ChunkProcessingProfiler.cpp" />
     <ClCompile Include="logger\GlobalParamsLogger.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -239,6 +247,17 @@
     <ClCompile Include="Vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="Vendor\stb_image\stb_image_write.cpp" />
     <ClCompile Include="World.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\block.shader" />
+    <None Include="shaders\blockHighlight.shader" />
+    <None Include="shaders\cuboidFace.shader" />
+    <None Include="shaders\FlatToScreen.shader" />
+    <None Include="shaders\light_source.shader" />
+    <None Include="shaders\liquid.shader" />
+    <None Include="shaders\model_phong.shader" />
+    <None Include="shaders\skybox.shader" />
+    <None Include="shaders\to_screen_flat.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

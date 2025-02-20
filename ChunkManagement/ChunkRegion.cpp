@@ -37,7 +37,6 @@ void ChunkRegion::addAdjacentChunk(ChunkPtr chunk, Directions2DHashed direction)
 			for (int z = 0; z < constChunkSize; z++)
 			{
 				centerAccess.data.setBlock(y, constChunkSize, z, adjAccess.data.getBlock(y, 0, z));
-					
 			}
 		break;
 	case Directions2DHashed::DIRECTION_BACKWARD:

@@ -163,8 +163,8 @@ void Game::close()
 
 int Game::run()
 {
-    int loadDistance = 50;
-    int numOfAllocatedThreads = /*std::thread::hardware_concurrency() * 0.7*/ 32;
+    int loadDistance = 20;
+    int numOfAllocatedThreads = /*std::thread::hardware_concurrency() * 0.7*/ 4;
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(0);
 
@@ -181,7 +181,7 @@ int Game::run()
 #endif //_DEBUG
 
     DataRepository::set("res/resourcePack");
-    m_gameServices.threadPool.init(16);
+    m_gameServices.threadPool.init(numOfAllocatedThreads);
     m_world.emplace(loadDistance, 1234, Player(0.f, 0.f, glm::vec3(2.f, 205.f, 2.f), glm::vec3(0.f), 
     GameContext(m_gameServices.gameEvents, m_gameServices.threadPool)),
         GameContext(m_gameServices.gameEvents, m_gameServices.threadPool));

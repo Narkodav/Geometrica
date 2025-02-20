@@ -28,26 +28,27 @@
 #define FACE_CULLING 0x01000000
 #define BLENDING 0x00100000
 
-enum renderFlags
-{
-	FLAG_DEPTH_TESTING = 0,
-	FLAG_FACE_CULLING,
-	FLAG_BLENDING,
-	FLAG_NUM,
-};
-
-enum Shaders
-{
-	SHADER_CUBOID = 0,
-	SHADER_BLOCK,
-	SHADER_BLOCK_HIGHLIGHT,
-	SHADER_SKYBOX,
-	SHADER_FLAT_TO_SCREEN,
-	SHADER_NUM,
-};
-
 class Renderer
 {
+public:
+	enum class RenderFlags
+	{
+		FLAG_DEPTH_TESTING = 0,
+		FLAG_FACE_CULLING,
+		FLAG_BLENDING,
+		FLAG_NUM,
+	};
+
+	enum class Shaders
+	{
+		SHADER_CUBOID = 0,
+		SHADER_LIQUID,
+		SHADER_BLOCK_HIGHLIGHT,
+		SHADER_SKYBOX,
+		SHADER_FLAT_TO_SCREEN,
+		SHADER_NUM,
+	};
+
 	struct RenderParams
 	{
 		float alpha;
@@ -67,9 +68,9 @@ private:
 	std::mutex m_mutex;
 	//ThreadPool m_meshLoaderThreads;
 
-	bool m_flags[FLAG_NUM];
+	bool m_flags[static_cast<size_t>(RenderFlags::FLAG_NUM)];
 	glm::mat4 m_projection;
-	Shader m_shaders[SHADER_NUM];
+	Shader m_shaders[static_cast<size_t>(Shaders::SHADER_NUM)];
 	float m_specularIntensity;
 
 	std::optional<WorldMesh> m_mesh;

@@ -6,7 +6,7 @@ ChunkMesh::ChunkMesh()
 	m_isSet = 0;
 
 	m_meshers[static_cast<size_t>(BlockMesherType::MESHING_CUBOID)] = std::make_unique<CuboidMesher>();
-
+	m_meshers[static_cast<size_t>(BlockMesherType::MESHING_LIQUID)] = std::make_unique<LiquidMesher>();
 	
     //setCacheSize();
 }
@@ -33,7 +33,7 @@ void ChunkMesh::set(ChunkRegionData& regionData)
 		for (int x = 0; x < constChunkSize; x++)
 			for (int z = 0; z < constChunkSize; z++)
 			{
-				id = access.data.getBlock(y, x, z);
+				id = access.data.getBlockId(y, x, z);
 				if (!id)
 					continue;
 				const std::unique_ptr<BlockTemplate>& block = DataRepository::getBlock(id);
@@ -211,8 +211,6 @@ void ChunkMesh::loadBuffers(unsigned int offset /*= 0*/)
 		mesher->buildBuffers();
 	}
 
-	glBindVertexArray(0);
-
 	m_isSet = 1;
 }
 
@@ -239,7 +237,8 @@ void ChunkMesh::deleteBuffers()
 
 void ChunkMesh::draw(BlockMesherType mesherType) const
 {
-	m_meshers[static_cast<size_t>(mesherType)]->draw();
+	if (!m_meshers[static_cast<size_t>(mesherType)]->isEmpty())
+		m_meshers[static_cast<size_t>(mesherType)]->draw();
 }
 
 //void ChunkMesh::drawComplicated() const

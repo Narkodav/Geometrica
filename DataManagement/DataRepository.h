@@ -9,8 +9,8 @@
 #include "Rendering/TextureAtlas.h"
 #include "Physics/Hitboxes.h"
 #include "platformCommon.h"
-#include "BlockFactory.h"
-#include "CuboidBlock.h"
+#include "Blocks/BlockFactory.h"
+#include "Cuboid.h"
 //#include "Item.h"
 
 

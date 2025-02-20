@@ -15,7 +15,7 @@
 #include "platformCommon.h"
 #include "DataManagement/Cuboid.h"
 #include "MesherTemplate.h"
-#include "DataManagement/CuboidBlock.h"
+#include "DataManagement/Blocks/CuboidBlock.h"
 #include "DataManagement/Cuboid.h"
 
 
@@ -41,7 +41,7 @@ public:
 		glm::ivec3 blockCoord;
 	};
 
-	static inline BlockMesherType mesherType = BlockMesherType::MESHING_CUBOID;
+	static inline const BlockMesherType mesherType = BlockMesherType::MESHING_CUBOID;
 
 private:
 
@@ -76,7 +76,7 @@ public:
 	void draw() override;
 
 	// Type and state queries
-	BlockMesherType getType() const override { return BlockMesherType::MESHING_CUBOID; };
+	BlockMesherType getType() const override { return mesherType; };
 	bool isDirty() const override { return m_needsRebuild; };
 	bool isEmpty() const override { return m_totalCapacity == 0; };
 };

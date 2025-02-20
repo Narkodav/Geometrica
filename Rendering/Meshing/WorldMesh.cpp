@@ -26,7 +26,7 @@ void WorldMesh::set()
 	"res/resourcePack/skybox/negz.png" });
 	m_blockHighlight.emplace(DataRepository::getAtlas().getStorageBufferIndex("highlight_texture"));
 }
-void WorldMesh::drawChunks(Shader& shaderCuboid, Shader& shaderBlock, glm::mat4 view, glm::mat4 projection)
+void WorldMesh::drawChunks(Shader& shaderCuboid, Shader& shaderLiquid, glm::mat4 view, glm::mat4 projection)
 {
 	shaderCuboid.Bind();
 	glUniformMatrix4fv(shaderCuboid.GetUniformLocation("u_viewTransform"), 1, GL_FALSE, &view[0][0]);
@@ -47,6 +47,110 @@ void WorldMesh::drawChunks(Shader& shaderCuboid, Shader& shaderBlock, glm::mat4 
 			chunkAccess->draw(BlockMesherType::MESHING_CUBOID);
 		}
 	}
+
+	shaderLiquid.Bind();
+	glUniformMatrix4fv(shaderLiquid.GetUniformLocation("u_viewTransform"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(shaderLiquid.GetUniformLocation("u_projectionTransform"), 1, GL_FALSE, &projection[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, DataRepository::getAtlas().getId());
+	glUniform1i(shaderLiquid.GetUniformLocation("u_Texture"), 0);
+	DataRepository::getAtlas().bindStorageBuffer();
+
+	for (auto& chunkMesh : access->meshes)
+	{
+		auto chunkAccess = chunkMesh.second->getReadAccess();
+		if (chunkAccess->getIsSet())
+		{
+			chunkAccess->draw(BlockMesherType::MESHING_LIQUID);
+		}
+	}
+
+	//{
+	//	unsigned int vao = 0;
+	//	unsigned int bufferAtlas;
+	//	unsigned int bufferRotation;
+	//	unsigned int bufferLevels;
+	//	unsigned int bufferPos;
+
+	//	std::vector<unsigned int> m_bufferAtlasIndices = {
+	//		DataRepository::getAtlas().getStorageBufferIndex("water"),
+	//		DataRepository::getAtlas().getStorageBufferIndex("water"),
+	//		DataRepository::getAtlas().getStorageBufferIndex("water"),
+	//		DataRepository::getAtlas().getStorageBufferIndex("water"),
+	//		DataRepository::getAtlas().getStorageBufferIndex("water"),
+	//		DataRepository::getAtlas().getStorageBufferIndex("water"),
+	//	};
+	//	std::vector<unsigned char> m_bufferRotationIndices = {
+	//		0, 1, 2, 3, 4, 5
+	//	};
+	//	std::vector<LiquidMesher::EdgeLevels> m_bufferLevels = {
+	//		LiquidMesher::EdgeLevels(),
+	//		LiquidMesher::EdgeLevels(),
+	//		LiquidMesher::EdgeLevels(),
+	//		LiquidMesher::EdgeLevels(),
+	//		LiquidMesher::EdgeLevels(),
+	//		LiquidMesher::EdgeLevels(),
+	//	};
+	//	std::vector<glm::vec3> m_bufferPositions = {
+	//		glm::vec3(1,0,0),
+	//		glm::vec3(1,0,0),
+	//		glm::vec3(1,0,0),
+	//		glm::vec3(1,0,0),
+	//		glm::vec3(1,0,0),
+	//		glm::vec3(1,0,0),
+	//	};
+
+	//	glGenVertexArrays(1, &vao);
+	//	glGenBuffers(1, &bufferAtlas);
+	//	glGenBuffers(1, &bufferRotation);
+	//	glGenBuffers(1, &bufferLevels);
+	//	glGenBuffers(1, &bufferPos);
+
+		//glBindVertexArray(vao);
+
+	//	//rebinding layout data
+	//	glBindBuffer(GL_ARRAY_BUFFER, Cuboid::getBuffer(Cuboid::Buffers::BUFFER_POSITION));
+	//	glEnableVertexAttribArray(static_cast<unsigned int>(Cuboid::Locations::LOCATION_POSITION));
+	//	glVertexAttribPointer(static_cast<unsigned int>(Cuboid::Locations::LOCATION_POSITION),
+	//		3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	//	//populating atlas index buffer
+	//	glBindBuffer(GL_ARRAY_BUFFER, bufferAtlas);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(m_bufferAtlasIndices[0]) * m_bufferAtlasIndices.size(), m_bufferAtlasIndices.data(), GL_DYNAMIC_DRAW);
+	//	glEnableVertexAttribArray(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_ATLAS_INDEX));
+	//	glVertexAttribIPointer(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_ATLAS_INDEX), 1, GL_UNSIGNED_INT, 0, 0);
+	//	glVertexAttribDivisor(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_ATLAS_INDEX), 1);
+
+	//	//populating rotation index buffer
+	//	glBindBuffer(GL_ARRAY_BUFFER, bufferRotation);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(m_bufferRotationIndices[0]) * m_bufferRotationIndices.size(), m_bufferRotationIndices.data(), GL_DYNAMIC_DRAW);
+	//	glEnableVertexAttribArray(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_FACE_INDEX));
+	//	glVertexAttribIPointer(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_FACE_INDEX), 1, GL_UNSIGNED_BYTE, 0, 0);
+	//	glVertexAttribDivisor(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_FACE_INDEX), 1);
+
+	//	//populating levels buffer
+	//	glBindBuffer(GL_ARRAY_BUFFER, bufferLevels);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(m_bufferLevels[0]) * m_bufferLevels.size(), m_bufferLevels.data(), GL_DYNAMIC_DRAW);
+	//	glEnableVertexAttribArray(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_LEVELS));
+	//	glVertexAttribIPointer(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_LEVELS), 4, GL_UNSIGNED_BYTE, 0, 0);
+	//	glVertexAttribDivisor(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_LEVELS), 1);
+
+	//	//populating positions buffer
+	//	glBindBuffer(GL_ARRAY_BUFFER, bufferPos);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(m_bufferPositions[0]) * m_bufferPositions.size(), m_bufferPositions.data(), GL_DYNAMIC_DRAW);
+	//	glEnableVertexAttribArray(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_TRANSPOSITION));
+	//	glVertexAttribPointer(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_TRANSPOSITION), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//	glVertexAttribDivisor(static_cast<unsigned int>(LiquidMesher::Locations::LOCATION_TRANSPOSITION), 1);
+	//
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Cuboid::getBuffer(Cuboid::Buffers::BUFFER_INDEX));
+	//	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, Cuboid::getNumberOfIndices(), GL_UNSIGNED_INT,
+	//		0, 6, 0);
+	//}
+
+	
+
 	//DataRepository::getCuboid("slabHorizontalDown").drawTest({ glm::vec3(0), glm::vec3(0.0f, 0.0f, -1.0f) }, { 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 });
 	//DataRepository::getCuboid("stairsBaseDownXPos").drawTest({ glm::vec3(0.0f, 0.0f, 1.0f) }, { 0, 1, 2, 0, 1, 2 });
 	//DataRepository::getCuboid("slabHorizontalDown").drawTest({ glm::vec3(0.0f, 0.0f, 2.0f) }, { 0, 1, 2, 0, 1, 2 });
