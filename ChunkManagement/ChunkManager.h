@@ -1,13 +1,17 @@
 #pragma once
+#include <queue>
 
 #include "ChunkMap.h"
 #include "Generator.h"
 #include "GameContext.h"
 #include "PhysicsManager.h"
+#include "DataManagement/Blocks/DynamicBlockTemplate.h"
 
 class ChunkManager
 {
 public:
+    using Subscription = MT::EventSystem<GameEventPolicy>::Subscription;
+
     struct ChunkMapQuery : public MapUpdateQueryInterface,
     public PhysicsManager::MapQueryInterface
 	{
@@ -37,18 +41,37 @@ private:
 	ChunkMap m_chunkMap;
 	glm::ivec2 m_lastRecordedCoords;
 	unsigned int m_simulationDistance;
+    GameServicesInterface<GameEventPolicy> m_gameServicesInterface;
+
+    Subscription m_blockUpdateSubscription;
+    Subscription m_blockBulkUpdateSubscription;
+
+    /*std::unordered_set<glm::ivec3> m_blockUpdateQueue;*/
 
 public:
-	ChunkManager(const GameContext& gameContext, Generator& generatorHandle, unsigned int m_loadDistance) :
-		m_chunkMap(m_loadDistance, generatorHandle, gameContext),
-		m_lastRecordedCoords(0, 0) {};
+    ChunkManager(const GameServicesInterface<GameEventPolicy>& gameServicesInterface, Generator& generatorHandle,
+    unsigned int m_loadDistance) :
+        m_chunkMap(m_loadDistance, generatorHandle, gameServicesInterface),
+        m_gameServicesInterface(gameServicesInterface),
+        m_lastRecordedCoords(0, 0),
+        m_blockUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_MODIFIED>
+            ([this](BlockModifiedEvent data)
+                { 
+                    m_chunkMap.changeBlock(data);
+                })),
+        m_blockBulkUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_MODIFIED_BULK>
+            ([this](const BlockModifiedBulkEvent& events)
+                {
+                    for (auto& data : events.modifications)
+                        m_chunkMap.changeBlock(data);
+                })) {};
 
 
     ChunkMapQuery getMapQuery() const { return ChunkMapQuery(m_chunkMap); };
 	
 	void updateChunkMap(const glm::ivec2& coords);
 
-    void updateDynamicBlocks(const glm::ivec2& coords);
+    void updateDynamicBlocks();
 
 	unsigned int getGeneratedAmount() { return m_chunkMap.getGeneratedAmount(); };
 

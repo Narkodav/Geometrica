@@ -10,31 +10,6 @@ Camera::Camera(glm::vec3 position, float pitch, float yaw)
 	this->set(position, pitch, yaw);
 }
 
-Camera::Camera(const Camera& camera)
-{
-	this->m_view = camera.m_view;
-	this->m_viewWithoutTranspos = camera.m_viewWithoutTranspos;
-	this->m_position = camera.m_position;
-	this->m_camFront = camera.m_camFront;
-	this->m_camRight = camera.m_camRight;
-	this->m_camUp = camera.m_camUp;
-	this->m_yaw = camera.m_yaw;
-	this->m_pitch = camera.m_pitch;
-}
-
-Camera& Camera::operator=(const Camera& camera)
-{
-	this->m_view = camera.m_view;
-	this->m_viewWithoutTranspos = camera.m_viewWithoutTranspos;
-	this->m_position = camera.m_position;
-	this->m_camFront = camera.m_camFront;
-	this->m_camRight = camera.m_camRight;
-	this->m_camUp = camera.m_camUp;
-	this->m_yaw = camera.m_yaw;
-	this->m_pitch = camera.m_pitch;
-	return *this;
-}
-
 void Camera::set(glm::vec3 position, float pitch, float yaw)
 {
 	m_pitch = pitch;

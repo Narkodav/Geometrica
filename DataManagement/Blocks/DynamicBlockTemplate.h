@@ -1,8 +1,11 @@
 #pragma once
+#include "GameContext.h"
 #include "BlockTemplate.h"
 #include "Multithreading/EventSystem.h"
-#include "GameEvents.h"
 //#include "ChunkManagement/ChunkMap.h"
+
+class BlockModifiedBulkEvent;
+class DynamicBlockDataTemplate;
 
 struct BlockData
 {
@@ -27,8 +30,16 @@ class DynamicBlockDataTemplate
 protected:
 	//put anything here
 	glm::ivec3 m_position;  // Position within chunk
+
+	// time is measured in game ticks
+	// this parameter is updated manually in update method
+	uint32_t m_lastUpdatedTick = 0;
+	uint32_t m_nextUpdateScheduledTick = 0;
 public:
-	DynamicBlockDataTemplate(glm::ivec3 position) : m_position(position) {};
+	DynamicBlockDataTemplate(glm::ivec3 position) :
+		m_position(position), m_lastUpdatedTick(0), m_nextUpdateScheduledTick(0) {};
+	DynamicBlockDataTemplate(glm::ivec3 position, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) :
+		m_position(position), m_lastUpdatedTick(lastUpdatedTick), m_nextUpdateScheduledTick(nextUpdateScheduledTick){};
 
 	virtual std::unique_ptr<DynamicBlockDataTemplate> clone() = 0;
 
@@ -36,7 +47,15 @@ public:
 
 	//implement any physics updates here
 	//if your block state depends on surrounding blocks use the map to check them, do not use it to actually modify blocks, the event system is used for that
-	virtual void update(const MapUpdateQueryInterface& map, MT::EventSystem<GameEventPolicy>& gameEvents) = 0;
+	//implement tick update logic yourself, use liquid block as an example
+	virtual BlockModifiedBulkEvent update(const MapUpdateQueryInterface& map, const GameClockInterface& clock) = 0;
+	virtual inline bool shouldUpdate(const GameClockInterface& clock) {
+		if (clock.getGlobalTime() >= m_nextUpdateScheduledTick)
+			return true;
+		return false;
+	};
+	inline uint32_t getLastUpdatedTick() const { return m_lastUpdatedTick; };
+
 	virtual BlockMesherType getMesherType() const = 0; //must correspond to DynamicBlock type, used only for debugging
 };
 
@@ -46,6 +65,9 @@ class DynamicBlockTemplate : public BlockTemplate
 	static_assert(std::is_base_of<DynamicBlockDataTemplate, DataType>::value,
 		"DataType must inherit from DynamicBlockData"); //assert children have DynamicBlockData defined
 
+	//set these on load
+	uint32_t m_timeToUpdate = 0;
+	uint32_t m_updateTimeInterval = 0;
 public:
 	virtual ~DynamicBlockTemplate() = default;
 	virtual const Phys::Hitbox* getHitbox() const = 0; //make it return nullptr if no collisions

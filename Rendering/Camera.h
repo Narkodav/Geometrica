@@ -17,8 +17,12 @@ public:
 
 	Camera();
 	Camera(glm::vec3 position, float pitch, float yaw);
-	Camera(const Camera& camera);
-	Camera& operator=(const Camera& camera);
+
+	Camera(const Camera&) = default;
+	Camera& operator=(const Camera&) = default;
+
+	Camera(Camera&&) = default;
+	Camera& operator=(Camera&&) = default;
 
 	void set(glm::vec3 position, float pitch, float yaw);
 	void move(glm::vec3 deltaPos);

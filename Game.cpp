@@ -102,7 +102,7 @@ void Game::processInputs()
         m_keyboard.m_keys[KEY_PLAYER_ACTION_FLAG].state = 1;
     }
 
-    m_world.value().handleInputs(m_mouse, m_keyboard, constDeltaTime); //mouse for LMB and RMB
+    m_world.value().handleInputs(m_mouse, m_keyboard, GameClock::deltaTime); //mouse for LMB and RMB
     for (int i = 0; i < KEY_COUNT; i++)
         m_keyboard.m_keys[i].isChanged = false;
     m_mouse.LMB.isChanged = false;
@@ -112,7 +112,7 @@ void Game::processInputs()
 
 Game::Game() : m_frameTime(0.f),
 m_fov(120.f), m_width(1000), m_height(800),
-m_renderer(GameContext(m_gameServices.gameEvents, m_gameServices.threadPool))
+m_renderer(m_gameServices.getInterface())
 {
     m_mouse.mouseSensitivity = 0.01f;
     m_mouse.scrollSensitivity = 2.0f;
@@ -182,9 +182,9 @@ int Game::run()
 
     DataRepository::set("res/resourcePack");
     m_gameServices.threadPool.init(numOfAllocatedThreads);
-    m_world.emplace(loadDistance, 1234, Player(0.f, 0.f, glm::vec3(2.f, 205.f, 2.f), glm::vec3(0.f), 
-    GameContext(m_gameServices.gameEvents, m_gameServices.threadPool)),
-        GameContext(m_gameServices.gameEvents, m_gameServices.threadPool));
+    m_world.emplace(loadDistance, 1234, 
+        Player(0.f, 0.f, glm::vec3(2.f, 205.f, 2.f), glm::vec3(0.f)),
+        m_gameServices.getInterface());
     m_renderer.set(DEPTH_TESTING | FACE_CULLING | BLENDING, loadDistance, 
     m_aspectRatio, m_fov, m_window, &m_world.value().getChunkManager().getChunkMap());
    
@@ -202,15 +202,17 @@ int Game::run()
         auto newTime = std::chrono::high_resolution_clock::now();
         m_frameTime = std::chrono::duration_cast<std::chrono::duration<float>>(newTime - currentTime).count();
         currentTime = newTime;
-        if (m_frameTime > constDeltaTime * 3)
-            m_frameTime = constDeltaTime * 3;
+        if (m_frameTime > GameClock::deltaTime * 3)
+            m_frameTime = GameClock::deltaTime * 3;
         accumulator += m_frameTime;
 
-        while (accumulator >= constDeltaTime)
+        while (accumulator >= GameClock::deltaTime)
         {
-            m_world.value().physicsUpdate(constDeltaTime);
-            accumulator -= constDeltaTime;
-            runTime += constDeltaTime;
+            m_world.value().physicsUpdate(GameClock::deltaTime);
+
+            m_gameServices.clock.increment();
+            accumulator -= GameClock::deltaTime;
+            runTime += GameClock::deltaTime;
         }
 
         if (runTime >= frameRateUpdateCounter)
@@ -219,7 +221,7 @@ int Game::run()
             frameRateUpdateCounter += 0.5;
         }
         m_world.value().iterate();
-        m_renderer.update({ accumulator / constDeltaTime,
+        m_renderer.update({ accumulator / GameClock::deltaTime,
         m_world.value().getPlayer().getPosition(),
         m_world.value().getPlayer().getVelocity(),
         m_world.value().getPlayer().getAcceleration(),

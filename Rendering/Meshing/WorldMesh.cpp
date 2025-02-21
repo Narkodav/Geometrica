@@ -1,13 +1,11 @@
 #include "WorldMesh.h"
 
-WorldMesh::WorldMesh(int renderAreaRadius, GameContext gameContext, const ChunkMap& chunkMap) :
-	m_eventSystem(gameContext.gameEvents),
-	m_taskMeshCoordinator(gameContext.threadPool,
-		gameContext.threadPool.getWorkerAmount() / 4),
-	m_taskUnmeshCoordinator(gameContext.threadPool,
-		gameContext.threadPool.getWorkerAmount() / 4),
+WorldMesh::WorldMesh(int renderAreaRadius, const GameServicesInterface<GameEventPolicy>& gameServicesInterface,
+	const ChunkMap& chunkMap) :
+	m_taskMeshCoordinator(gameServicesInterface.getTaskCoordinator(gameServicesInterface.getWorkerAmount() / 4)),
+	m_taskUnmeshCoordinator(gameServicesInterface.getTaskCoordinator(gameServicesInterface.getWorkerAmount() / 4)),
 	m_chunkMap(chunkMap), m_renderAreaRadius(renderAreaRadius),
-	m_blockUpdateSubscription(gameContext.gameEvents.subscribe<GameEventTypes::BLOCK_REMESH>
+	m_blockUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_REMESH>
 		([this](BlockRemeshEvent data)
 			{ blockModified(data); }))
 {

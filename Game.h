@@ -18,24 +18,9 @@
 
 class Game
 {
-public:
-	struct GameServices
-	{
-		MT::EventSystem<GameEventPolicy> gameEvents;
-		MT::ThreadPool threadPool;
-
-		GameServices() = default;
-
-		GameServices(const GameServices& other) = delete;
-		GameServices& operator=(const GameServices& other) = delete;
-
-		GameServices(GameServices&& other) = default;
-		GameServices& operator=(GameServices&& other) = default;
-	};
-
 private:
 
-	GameServices m_gameServices;
+	GameServices<GameEventPolicy> m_gameServices; // contains references to necessary classes that have to be used by other classes
 
 	GLFWwindow* m_window;
 

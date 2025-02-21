@@ -3,17 +3,29 @@
 #include <vector>
 
 #include "MultiThreading/EventPolicy.h"
-//#include "DataManagement/Blocks/DynamicBlockTemplate.h"
+#include "DataManagement/Blocks/DynamicBlockTemplate.h"
 
 #include <glm/glm.hpp>
-
-class DynamicBlockDataTemplate;
 
 //utility structs:
 struct BlockModifiedEvent {
     glm::ivec3 blockCoord;
     unsigned int blockId;
     std::unique_ptr<DynamicBlockDataTemplate> newDynamicData = nullptr; //not necessary
+
+    BlockModifiedEvent() = default;
+
+    BlockModifiedEvent(glm::ivec3 blockCoord, unsigned int blockId,
+        std::unique_ptr<DynamicBlockDataTemplate> newDynamicData = nullptr) :
+        blockCoord(blockCoord),
+        blockId(blockId),
+        newDynamicData(std::move(newDynamicData)) {};
+
+    BlockModifiedEvent(BlockModifiedEvent&&) = default;
+    BlockModifiedEvent& operator=(BlockModifiedEvent&&) = default;
+
+    BlockModifiedEvent(const BlockModifiedEvent&) = delete;
+    BlockModifiedEvent& operator=(const BlockModifiedEvent&) = delete;
 };
 
 struct BlockRemeshEvent {
@@ -24,6 +36,13 @@ struct BlockRemeshEvent {
 
 struct BlockModifiedBulkEvent {
     std::vector<BlockModifiedEvent> modifications;
+
+    BlockModifiedBulkEvent() = default;
+    BlockModifiedBulkEvent(BlockModifiedBulkEvent&&) = default;
+    BlockModifiedBulkEvent& operator=(BlockModifiedBulkEvent&&) = default;
+
+    BlockModifiedBulkEvent(const BlockModifiedBulkEvent&) = delete;
+    BlockModifiedBulkEvent& operator=(const BlockModifiedBulkEvent&) = delete;
 };
 
 struct BlockRemeshBulkEvent {
@@ -56,13 +75,13 @@ struct GameEventPolicy::Traits<GameEventTypes::BLOCK_REMESH> {
 template<>
 template<>
 struct GameEventPolicy::Traits<GameEventTypes::BLOCK_MODIFIED_BULK> {
-    using Signature = void(BlockModifiedBulkEvent); //vector of modifications
+    using Signature = void(const BlockModifiedBulkEvent&); //vector of modifications
 };
 
 template<>
 template<>
 struct GameEventPolicy::Traits<GameEventTypes::BLOCK_REMESH_BULK> {
-    using Signature = void(BlockRemeshBulkEvent); //vector of remeshes
+    using Signature = void(const BlockRemeshBulkEvent&); //vector of remeshes
 };
 
 //template<>

@@ -1,12 +1,6 @@
 #include "Player.h"
 
-Player::Player(GameContext gameContext) : m_gameContext(gameContext)
-{
-
-}
-
-Player::Player(float yaw, float pitch, const glm::vec3& playerPosition, const glm::vec3& speed, GameContext gameContext)
-	: m_gameContext(gameContext)
+Player::Player(float yaw, float pitch, const glm::vec3& playerPosition, const glm::vec3& speed)
 {
 	set(yaw, pitch, playerPosition, speed);
 }
@@ -20,7 +14,8 @@ void Player::set(float yaw, float pitch, const glm::vec3& playerPosition, const 
 	m_playerChunkCoords.y = m_playerCoords.z / constChunkSize;
 }
 
-void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard)
+void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard, 
+	EventSystemInterface<GameEventPolicy> interface)
 {
 	glm::vec3 buffer = glm::vec3(0.f);
 
@@ -62,7 +57,7 @@ void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard)
 		//hand animation...
 		if (m_raycastResult.hit)
 		{
-			m_gameContext.gameEvents.emit<GameEventTypes::BLOCK_MODIFIED>(
+			interface.emit<GameEventTypes::BLOCK_MODIFIED>(
 				BlockModifiedEvent{ m_raycastResult.blockPos, DataRepository::airId, nullptr });
 		}
 	}
@@ -71,7 +66,7 @@ void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard)
 		//hand animation...
 		if (m_raycastResult.hit)
 		{
-			m_gameContext.gameEvents.emit<GameEventTypes::BLOCK_MODIFIED>(
+			interface.emit<GameEventTypes::BLOCK_MODIFIED>(
 				BlockModifiedEvent{ m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal),
 				DataRepository::getBlock("water")->getId() });
 		}

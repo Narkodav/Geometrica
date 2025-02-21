@@ -1,16 +1,17 @@
 #include "World.h"
 
-World::World(int loadDistance, unsigned int worldSeed, 
-	const Player& player, const GameContext& gameContext) :
-	m_loadDistance(loadDistance), m_worldSeed(worldSeed), m_player(player), 
-	m_chunkManager(gameContext, m_generator, m_loadDistance)
+World::World(int loadDistance, unsigned int worldSeed,
+	const Player& player, const GameServicesInterface<GameEventPolicy>& gameServicesInterface) :
+	m_loadDistance(loadDistance), m_worldSeed(worldSeed), m_player(player),
+	m_chunkManager(gameServicesInterface, m_generator, m_loadDistance),
+	m_eventSystemInterface(gameServicesInterface)
 {
 	m_generator.set(m_worldSeed);
 };
 
 void World::handleInputs(Mouse& mouse, const Keyboard& keyboard, float deltaTime)
 {
-	m_player.handleInputs(mouse, keyboard);
+	m_player.handleInputs(mouse, keyboard, m_eventSystemInterface);
 	m_player.handleMouseMove(mouse, deltaTime);
 	
 }
@@ -18,6 +19,7 @@ void World::handleInputs(Mouse& mouse, const Keyboard& keyboard, float deltaTime
 void World::physicsUpdate(float deltaTime)
 {
 	m_player.update(deltaTime, m_chunkManager.getMapQuery());
+	m_chunkManager.updateDynamicBlocks();
 	/*m_chunkManager.update(m_player.getChunkCoords());*/
 }
 

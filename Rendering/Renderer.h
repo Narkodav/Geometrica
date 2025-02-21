@@ -74,7 +74,6 @@ private:
 	float m_specularIntensity;
 
 	std::optional<WorldMesh> m_mesh;
-	GameContext m_gameContext;
 	const ChunkMap* m_chunkMapHandle;
 
 	int m_renderDistance;
@@ -87,7 +86,7 @@ private:
 	int m_newHeight = 0;
 	std::atomic<bool> m_isRendering = 0;
 	RenderParams m_renderParams;
-
+	GameServicesInterface<GameEventPolicy> m_gameServicesInterface;
 	FrameRateCalculator m_frameRateCalculator;
 
 	Billboard debugBillboard;
@@ -106,7 +105,7 @@ public:
 		int length, const char* message, const void* userParam);
 #endif // _DEBUG
 
-	Renderer(const GameContext& gameContext);
+	Renderer(const GameServicesInterface<GameEventPolicy>& gameServicesInterface);
 	~Renderer();
 
 	void set(unsigned int parameters, int renderDistance, float aspectRatio, 

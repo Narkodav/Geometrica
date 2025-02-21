@@ -33,16 +33,21 @@ private:
 	bool m_flightMode;
 	PhysicsManager::BlockRaycastResult m_raycastResult;
 	Area m_selectedArea;
-
-	GameContext m_gameContext;
-
+	
 public:
-	Player(GameContext gameContext);
+	Player() = default;
 
-	Player(float yaw, float pitch, const glm::vec3& playerPosition, const glm::vec3& speed, GameContext gameContext);
+	Player(float yaw, float pitch, const glm::vec3& playerPosition, const glm::vec3& speed);
 	void set(float yaw, float pitch, const glm::vec3& playerPosition, const glm::vec3& speed);
 
-	void handleInputs(const Mouse& mouse, const Keyboard& keyboard);
+	Player(const Player&) = default;
+	Player& operator=(const Player&) = default;
+
+	Player(Player&&) = default;
+	Player& operator=(Player&&) = default;
+
+	void handleInputs(const Mouse& mouse, const Keyboard& keyboard,
+		EventSystemInterface<GameEventPolicy> interface);
 	void handleMouseMove(Mouse& mouse, float delta);
 
 	void update(float deltaTime, const PhysicsManager::MapQueryInterface& chunkMap);

@@ -1,13 +1,10 @@
 #include "ChunkMap.h"
 
-ChunkMap::ChunkMap(unsigned int loadDistance, Generator& generatorHandle, 
-	const GameContext& gameContext) :
-	m_loadDistance(loadDistance), m_loadingTaskCoordinator(gameContext.threadPool, gameContext.threadPool.getWorkerAmount() / 4),
-	m_unloadingTaskCoordinator(gameContext.threadPool, gameContext.threadPool.getWorkerAmount() / 4),
-	m_generator(generatorHandle), m_chunkCounter(0), m_eventSystem(gameContext.gameEvents),
-	m_blockUpdateSubscription(gameContext.gameEvents.subscribe<GameEventTypes::BLOCK_MODIFIED>
-		([this](BlockModifiedEvent data)
-			{ this->changeBlock(data); }))
+ChunkMap::ChunkMap(unsigned int loadDistance, Generator& generator,
+	const GameServicesInterface<GameEventPolicy>& gameServicesInterface) :
+	m_loadDistance(loadDistance), m_loadingTaskCoordinator(gameServicesInterface.getTaskCoordinator(gameServicesInterface.getWorkerAmount() / 4)),
+	m_unloadingTaskCoordinator(gameServicesInterface.getTaskCoordinator(gameServicesInterface.getWorkerAmount() / 4)),
+	m_generator(generator), m_chunkCounter(0), m_eventSystemInterface(gameServicesInterface)
 {
 	m_loadDistanceSquaredWithCushion = pow(m_loadDistance + 0.5, 2);
 	m_chunkPool.set(pow((m_loadDistance * 2 + 1), 2) * 2);
@@ -171,14 +168,14 @@ void ChunkMap::changeBlock(const BlockModifiedEvent& blockModification)
 			chunkAccess.data.setBlock(localCoords.y, localCoords.x, localCoords.z, blockModification.blockId);
 		}
 		coupleChunks(access, chunk->second, chunkCoords);
-		m_eventSystem.emit<GameEventTypes::BLOCK_REMESH>(
+		m_eventSystemInterface.emit<GameEventTypes::BLOCK_REMESH>(
 			BlockRemeshEvent{ blockModification.blockCoord, blockModification.blockId, previousId });
 
 		for (int i = 0; i < constDirectionVectors3DHashed.size(); i++)
 		{
 			glm::ivec3 adjCoord = blockModification.blockCoord + constDirectionVectors3DHashed[i];
 			unsigned int currentId = getBlockId(adjCoord, access);
-			m_eventSystem.emit<GameEventTypes::BLOCK_REMESH>(
+			m_eventSystemInterface.emit<GameEventTypes::BLOCK_REMESH>(
 				BlockRemeshEvent{ adjCoord, currentId, currentId });
 		}
 

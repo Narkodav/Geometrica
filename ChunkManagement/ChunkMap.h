@@ -25,6 +25,8 @@
 class ChunkMap
 {
 public:
+	
+
 	enum class ChunkState
 	{
 		GENERATED,
@@ -64,8 +66,7 @@ private:
 	MT::TaskCoordinator m_loadingTaskCoordinator;
 	MT::TaskCoordinator m_unloadingTaskCoordinator;
 	Generator& m_generator;
-	MT::EventSystem<GameEventPolicy>& m_eventSystem;
-	MT::EventSystem<GameEventPolicy>::Subscription m_blockUpdateSubscription;
+	EventSystemInterface<GameEventPolicy> m_eventSystemInterface;
 
 	MT::Synchronized<ChunkMapData> m_mapData;
 
@@ -77,7 +78,7 @@ private:
 
 public:
 	ChunkMap(unsigned int loadDistance, Generator& generator,
-		const GameContext& gameContext);
+		const GameServicesInterface<GameEventPolicy>& gameServicesInterface);
 
 	~ChunkMap() {
 		MT::ThreadPool& handle = m_loadingTaskCoordinator.getPoolHandle();
@@ -172,7 +173,6 @@ public:
 
 	auto getMapDataAccess() const { return m_mapData.getReadAccess(); };
 
-private:
 	void changeBlock(const BlockModifiedEvent& blockModification); //use the event system
 };
 

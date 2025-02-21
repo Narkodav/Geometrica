@@ -21,6 +21,7 @@
 class WorldMesh
 {
 public:
+	using Subscription = MT::EventSystem<GameEventPolicy>::Subscription;
 
 	struct BufferQueueElem
 	{
@@ -79,8 +80,8 @@ private:
 	static inline const std::chrono::duration<double, std::micro> bufferLoadTimeLimit{ 20 };
 	static inline const std::chrono::duration<double, std::micro> bufferUnloadTimeLimit{ 20 };
 
-	MT::EventSystem<GameEventPolicy>& m_eventSystem;
-	MT::EventSystem<GameEventPolicy>::Subscription m_blockUpdateSubscription;
+	/*EventSystemInterface<GameEventPolicy> m_eventSystemInterface;*/
+	Subscription m_blockUpdateSubscription;
 
 	MT::TaskCoordinator m_taskMeshCoordinator;
 	MT::TaskCoordinator m_taskUnmeshCoordinator;
@@ -106,7 +107,8 @@ private:
 	unsigned int m_renderAreaRadiusWithPaddingSquared;
 public:
 
-	WorldMesh(int renderAreaRadius, GameContext gameContext, const ChunkMap& chunkMap);
+	WorldMesh(int renderAreaRadius, const GameServicesInterface<GameEventPolicy>& gameServicesInterface,
+		const ChunkMap& chunkMap);
 
 	~WorldMesh() { 
 		MT::ThreadPool& handle = m_taskMeshCoordinator.getPoolHandle();

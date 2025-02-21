@@ -12,8 +12,6 @@
 
 const int constMinYCoord = 0, constWorldHeight = 512, constChunkSize = 16, constChunkSlice = constChunkSize * constChunkSize, constChunkCapacity = constWorldHeight * constChunkSlice;
 const float constFreeFallAcceleration = 9.14f;
-const float constTicksPerSecond = 60.f;
-const float constDeltaTime = 1.f / constTicksPerSecond;
 const float friction = 0.1f;
 
 //XYZ

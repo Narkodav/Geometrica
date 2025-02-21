@@ -45,8 +45,8 @@ void APIENTRY Renderer::static_glDebugOutput(unsigned int source, unsigned int t
 }
 #endif // _DEBUG
 
-Renderer::Renderer(const GameContext& gameContext) :
-    m_gameContext(gameContext)
+Renderer::Renderer(const GameServicesInterface<GameEventPolicy>& gameServicesInterface) :
+    m_gameServicesInterface(gameServicesInterface)
 {
 
 }
@@ -107,7 +107,7 @@ void Renderer::setForThread(unsigned int parameters, int renderDistance, float a
     m_shaders[static_cast<size_t>(Shaders::SHADER_FLAT_TO_SCREEN)].set("shaders/FlatToScreen.shader");
 
     debugBillboard.set();
-    m_mesh.emplace(m_renderDistance, m_gameContext, *chunkMapHandle);
+    m_mesh.emplace(m_renderDistance, m_gameServicesInterface, *chunkMapHandle);
     m_mesh.value().set();
     rendererLoop();
 }
@@ -195,7 +195,7 @@ void Renderer::terminate()
 
 void Renderer::render(RenderParams params)
 {
-    float delta = constDeltaTime * params.alpha;
+    float delta = GameClock::deltaTime * params.alpha;
     glm::vec3 currentPos = params.position;
     glm::vec3 futurePos = currentPos + params.velocity * delta + params.acceleration * delta * delta * 0.5f;
     glm::vec3 interpolatedDelta = params.alpha * (futurePos - currentPos);

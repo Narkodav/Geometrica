@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <memory>
 
+#include "GameEvents.h"
 #include "Utilities/vector3d.h"
 #include "platformCommon.h"
 #include "DataManagement/Blocks/DynamicBlockTemplate.h"
@@ -20,6 +21,7 @@ private:
 	Utils::Vector3d<uint32_t> m_blockData;
 	glm::ivec2 m_coords;
     std::unordered_map<glm::ivec3, std::unique_ptr<DynamicBlockDataTemplate>> m_dynamicBlockData; //this will be used with physics affected or dynamic blocks
+    
 public:
     inline void setBlock(const int& y, const int& x, const int& z, const uint32_t& block) 
     { 
@@ -61,6 +63,39 @@ public:
     {
         return m_blockData(y + 1, x + 1, z + 1);
     };
+
+    
+    BlockModifiedBulkEvent updateDynamicBlocks(
+        const MapUpdateQueryInterface& map, const GameClockInterface& clock) const
+    {
+        if (m_dynamicBlockData.empty())
+            return BlockModifiedBulkEvent();
+
+        BlockModifiedBulkEvent bulkEvent;
+        for (auto& blockData : m_dynamicBlockData)
+        {
+            if (!blockData.second->shouldUpdate(clock))
+                continue;
+            BlockModifiedBulkEvent bulkModificationBuffer;
+            bulkModificationBuffer = blockData.second->update(map, clock);
+            for (BlockModifiedEvent& ptr : bulkModificationBuffer.modifications) {
+                bulkEvent.modifications.emplace_back(std::move(ptr));
+            }
+        }
+
+        return bulkEvent;
+    };
+
+    //BlockModifiedBulkEvent updateDynamicBlock(const MapUpdateQueryInterface& map, const glm::ivec3& blockCoord) const
+    //{
+    //    if (m_dynamicBlockData.empty())
+    //        return BlockModifiedBulkEvent();
+
+    //    auto data = m_dynamicBlockData.find(blockCoord);
+    //    if (data != m_dynamicBlockData.end())
+    //        return data->second->update(map);
+    //    return BlockModifiedBulkEvent();
+    //};
 
     inline const glm::ivec2 getCoords() const { return m_coords; };
     inline void setCoords(glm::ivec2 newCoords) { m_coords = newCoords; };

@@ -1,12 +1,13 @@
 #pragma once
 #include <memory>
 
+#include "GameEvents.h"
 #include "DynamicBlockDataFactory.h"
 #include "BlockFactory.h"
 #include "Utilities/PathFinder.h"
 #include "Utilities/PathFinderContext.h"
 #include "Multithreading/EventSystem.h"
-#include "GameEvents.h"
+
 
 class LiquidBlockData : public DynamicBlockDataTemplate
 {
@@ -72,23 +73,27 @@ protected:
 	bool m_isSource;
 
 public:
-	LiquidBlockData(glm::ivec3 coord) :
-		DynamicBlockDataTemplate(coord), m_currentLevel(sourceLevel), m_isSource(true) {};
+	//LiquidBlockData(glm::ivec3 coord) :
+	//	DynamicBlockDataTemplate(coord), m_currentLevel(sourceLevel), m_isSource(true) {};
 
-	LiquidBlockData(glm::ivec3 coord, bool isSource, unsigned char level) :
-		DynamicBlockDataTemplate(coord), m_currentLevel(level), m_isSource(isSource) {};
+	LiquidBlockData(glm::ivec3 coord, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) :
+		DynamicBlockDataTemplate(coord, lastUpdatedTick, nextUpdateScheduledTick), m_currentLevel(sourceLevel), m_isSource(true) {};
+
+	LiquidBlockData(glm::ivec3 coord, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick, bool isSource, unsigned char level) :
+		DynamicBlockDataTemplate(coord, lastUpdatedTick, nextUpdateScheduledTick), m_currentLevel(level), m_isSource(isSource) {};
 
 	virtual ~LiquidBlockData() override = default;
-	virtual void update(const MapUpdateQueryInterface& map, MT::EventSystem<GameEventPolicy>& gameEvents) override;
-	void updateForSource(const MapUpdateQueryInterface& map, MT::EventSystem<GameEventPolicy>& gameEvents);
-	void updateForFlowing(const MapUpdateQueryInterface& map, MT::EventSystem<GameEventPolicy>& gameEvents);
+	virtual BlockModifiedBulkEvent update(const MapUpdateQueryInterface& map, const GameClockInterface& clock) override;
+	BlockModifiedBulkEvent updateForSource(const MapUpdateQueryInterface& map);
+	BlockModifiedBulkEvent updateForFlowing(const MapUpdateQueryInterface& map);
 	std::vector<glm::ivec3> getAvailableDirections(const MapUpdateQueryInterface& map, glm::ivec3 blockCoord);
 	unsigned char getCurrentLevel() const { return m_currentLevel; };
 	virtual BlockMesherType getMesherType() const override { return BlockMesherType::MESHING_LIQUID; };
 	bool isSource() const { return m_isSource; };
 
 	virtual std::unique_ptr<DynamicBlockDataTemplate> clone() override {
-		return std::make_unique<LiquidBlockData>(m_position, m_isSource, m_currentLevel);
+		return std::make_unique<LiquidBlockData>(
+			m_position, m_lastUpdatedTick, m_nextUpdateScheduledTick, m_isSource, m_currentLevel);
 	};
 };
 
