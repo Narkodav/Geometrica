@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Vendor/glfw-3.4.bin.WIN64
+/Geometrica.vcxproj
+/Geometrica.vcxproj.filters
+/Geometrica.vcxproj.filters
+/Geometrica.vcxproj
