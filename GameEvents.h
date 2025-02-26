@@ -63,25 +63,25 @@ struct GameEventPolicy : MT::EventPolicy<GameEventTypes, static_cast<size_t>(Gam
 template<>
 template<>
 struct GameEventPolicy::Traits<GameEventTypes::BLOCK_MODIFIED> {
-    using Signature = void(BlockModifiedEvent); //block coord and id
+    using Signature = void(BlockModifiedEvent&&); //block coord and id
 };
 
 template<>
 template<>
 struct GameEventPolicy::Traits<GameEventTypes::BLOCK_REMESH> {
-    using Signature = void(BlockRemeshEvent); //block coord and id
+    using Signature = void(BlockRemeshEvent&&); //block coord and id
 };
 
 template<>
 template<>
 struct GameEventPolicy::Traits<GameEventTypes::BLOCK_MODIFIED_BULK> {
-    using Signature = void(const BlockModifiedBulkEvent&); //vector of modifications
+    using Signature = void(BlockModifiedBulkEvent&&); //vector of modifications
 };
 
 template<>
 template<>
 struct GameEventPolicy::Traits<GameEventTypes::BLOCK_REMESH_BULK> {
-    using Signature = void(const BlockRemeshBulkEvent&); //vector of remeshes
+    using Signature = void(BlockRemeshBulkEvent&&); //vector of remeshes
 };
 
 //template<>

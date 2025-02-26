@@ -30,32 +30,39 @@ class DynamicBlockDataTemplate
 protected:
 	//put anything here
 	glm::ivec3 m_position;  // Position within chunk
-
+	uint32_t m_id;
 	// time is measured in game ticks
 	// this parameter is updated manually in update method
 	uint32_t m_lastUpdatedTick = 0;
 	uint32_t m_nextUpdateScheduledTick = 0;
 public:
-	DynamicBlockDataTemplate(glm::ivec3 position) :
+	DynamicBlockDataTemplate(glm::ivec3 position, uint32_t id) :
 		m_position(position), m_lastUpdatedTick(0), m_nextUpdateScheduledTick(0) {};
-	DynamicBlockDataTemplate(glm::ivec3 position, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) :
+	DynamicBlockDataTemplate(glm::ivec3 position, uint32_t id, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) :
 		m_position(position), m_lastUpdatedTick(lastUpdatedTick), m_nextUpdateScheduledTick(nextUpdateScheduledTick){};
 
 	virtual std::unique_ptr<DynamicBlockDataTemplate> clone() = 0;
 
 	virtual ~DynamicBlockDataTemplate() = default;
 
-	//implement any physics updates here
-	//if your block state depends on surrounding blocks use the map to check them, do not use it to actually modify blocks, the event system is used for that
-	//implement tick update logic yourself, use liquid block as an example
+	DynamicBlockDataTemplate(const DynamicBlockDataTemplate&) = default;
+	DynamicBlockDataTemplate(DynamicBlockDataTemplate&&) = default;
+	DynamicBlockDataTemplate& operator=(DynamicBlockDataTemplate&&) = default;
+
+	// implement any physics updates here
+	// if your block state depends on surrounding blocks use the map to check them, 
+	// do not use it to actually modify blocks, the event system is used for that
+
 	virtual BlockModifiedBulkEvent update(const MapUpdateQueryInterface& map, const GameClockInterface& clock) = 0;
 	virtual inline bool shouldUpdate(const GameClockInterface& clock) {
 		if (clock.getGlobalTime() >= m_nextUpdateScheduledTick)
 			return true;
 		return false;
 	};
-	inline uint32_t getLastUpdatedTick() const { return m_lastUpdatedTick; };
 
+	inline uint32_t getLastUpdatedTick() const { return m_lastUpdatedTick; };
+	inline const glm::vec3& getPosition() const { return m_position; };
+	inline const uint32_t& getId() const { return m_id; };
 	virtual BlockMesherType getMesherType() const = 0; //must correspond to DynamicBlock type, used only for debugging
 };
 
@@ -75,4 +82,10 @@ public:
 	virtual bool isDynamic() { return true; };
 	virtual BlockMesherType getMesherType() const = 0;
 	virtual std::string getType() const = 0;
+
+	// this is used when getting blocks data for placement
+	// you can also use this in the update method to place a block
+	// impelemnt tick calculation for block updates (when to update)
+	virtual std::unique_ptr<DynamicBlockDataTemplate>&& getBlockData(const glm::ivec3& blockCoord, uint32_t id,
+		const GameClockInterface& clock) const = 0;
 };

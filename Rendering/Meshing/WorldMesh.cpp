@@ -6,7 +6,7 @@ WorldMesh::WorldMesh(int renderAreaRadius, const GameServicesInterface<GameEvent
 	m_taskUnmeshCoordinator(gameServicesInterface.getTaskCoordinator(gameServicesInterface.getWorkerAmount() / 4)),
 	m_chunkMap(chunkMap), m_renderAreaRadius(renderAreaRadius),
 	m_blockUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_REMESH>
-		([this](BlockRemeshEvent data)
+		([this](BlockRemeshEvent&& data)
 			{ blockModified(data); }))
 {
 	m_chunkMeshPool.set(pow(m_renderAreaRadius * 2 + 1, 2) * 2);

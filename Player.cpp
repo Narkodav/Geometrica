@@ -15,7 +15,7 @@ void Player::set(float yaw, float pitch, const glm::vec3& playerPosition, const 
 }
 
 void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard, 
-	EventSystemInterface<GameEventPolicy> interface)
+	GameServicesInterface<GameEventPolicy> interface)
 {
 	glm::vec3 buffer = glm::vec3(0.f);
 
@@ -68,7 +68,10 @@ void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard,
 		{
 			interface.emit<GameEventTypes::BLOCK_MODIFIED>(
 				BlockModifiedEvent{ m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal),
-				DataRepository::getBlock("water")->getId() });
+				DataRepository::getBlock("water")->getId(), DynamicBlockDataFactory::createBlockData(
+					"LiquidBlock",m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal),
+					DataRepository::getBlock("water")->getId(),
+					interface.getGlobalTime(),interface.getGlobalTime() + 30) });
 		}
 	}
 

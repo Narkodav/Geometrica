@@ -55,15 +55,15 @@ public:
         m_gameServicesInterface(gameServicesInterface),
         m_lastRecordedCoords(0, 0),
         m_blockUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_MODIFIED>
-            ([this](BlockModifiedEvent data)
+            ([this](BlockModifiedEvent&& data)
                 { 
-                    m_chunkMap.changeBlock(data);
+                    m_chunkMap.changeBlock(std::move(data));
                 })),
         m_blockBulkUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_MODIFIED_BULK>
-            ([this](const BlockModifiedBulkEvent& events)
+            ([this](BlockModifiedBulkEvent&& events)
                 {
                     for (auto& data : events.modifications)
-                        m_chunkMap.changeBlock(data);
+                        m_chunkMap.changeBlock(std::move(data));
                 })) {};
 
 

@@ -5,8 +5,8 @@
 #include <map>
 #include <variant>
 
-#include "Rendering/Model.h"
 #include "Rendering/TextureAtlas.h"
+#include "Rendering/Texture.h"
 #include "Physics/Hitboxes.h"
 #include "platformCommon.h"
 #include "Blocks/BlockFactory.h"
@@ -32,7 +32,7 @@ public:
 private:
 	static inline std::map<uint32_t, std::unique_ptr<BlockTemplate>> m_blocks;
 	static inline std::map<std::string, unsigned int> m_blockNameMap;
-	static inline std::map<std::string, Model> m_models;
+	//static inline std::map<std::string, Model> m_models;
 	static inline std::map<std::string, Cuboid> m_cuboids;
 	static inline std::map<std::string, Texture> m_textures;
 	static inline std::map<std::string, std::unique_ptr<Phys::Hitbox>> m_hitboxes;
@@ -42,7 +42,7 @@ private:
 	static void readPaths(std::vector<std::string>& container, const std::string& path);
 	
 	static void setBlocks();
-	static void setModels();
+	//static void setModels();
 	static void setCuboids();
 	static void setTextures();
 	static void setHitboxes();
@@ -56,7 +56,7 @@ public:
 	static const std::unique_ptr<BlockTemplate>& getBlock(unsigned int id) { return m_blocks.find(id)->second; };
 	static const std::unique_ptr<BlockTemplate>& getBlock(std::string name) { return m_blocks.find(m_blockNameMap.find(name)->second)->second; };
 	static const std::map<unsigned int, std::unique_ptr<BlockTemplate>>& getBlocks() { return m_blocks; };
-	static const Model& getModel(const std::string& modelName) { return m_models.find(modelName)->second; };
+	//static const Model& getModel(const std::string& modelName) { return m_models.find(modelName)->second; };
 	static const Cuboid& getCuboid(const std::string& cuboidName) { return m_cuboids.find(cuboidName)->second; };
 	static const Texture& getTexture(const std::string& textureName) { return m_textures.find(textureName)->second; };
 	static const TextureAtlas& getAtlas() { return m_textureAtlas; };

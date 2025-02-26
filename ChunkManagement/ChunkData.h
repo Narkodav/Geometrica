@@ -23,22 +23,20 @@ private:
     std::unordered_map<glm::ivec3, std::unique_ptr<DynamicBlockDataTemplate>> m_dynamicBlockData; //this will be used with physics affected or dynamic blocks
     
 public:
+
+    //do not use this with dynamic blocks
     inline void setBlock(const int& y, const int& x, const int& z, const uint32_t& block) 
     { 
         m_blockData(y + 1, x + 1, z + 1) = block;
-        if (block == DataRepository::airId)
-            return;
-        const auto& blockData = DataRepository::getBlock(block);
-        if(blockData->isDynamic())
-            m_dynamicBlockData[glm::ivec3(x, y, z)] = 
-            std::move(DynamicBlockDataFactory::createBlockData(blockData->getType(), glm::ivec3(x, y, z)));
+        const auto& iter = m_dynamicBlockData.find(glm::ivec3(x, y, z));
+        if (iter != m_dynamicBlockData.end())
+            m_dynamicBlockData.erase(iter);
     };
 
     inline void setBlock(const int& y, const int& x, const int& z, const BlockData& block)
     {
         m_blockData(y + 1, x + 1, z + 1) = block.blockId;
-        if(block.dynamicData != nullptr)
-            m_dynamicBlockData[glm::ivec3(x, y, z)] = std::move(block.dynamicData->clone());
+        m_dynamicBlockData[glm::ivec3(x, y, z)] = std::move(block.dynamicData->clone());
     };
 
     inline BlockData getBlock(const int& y, const int& x, const int& z) const
@@ -76,6 +74,7 @@ public:
         {
             if (!blockData.second->shouldUpdate(clock))
                 continue;
+            glm::ivec3 position;
             BlockModifiedBulkEvent bulkModificationBuffer;
             bulkModificationBuffer = blockData.second->update(map, clock);
             for (BlockModifiedEvent& ptr : bulkModificationBuffer.modifications) {

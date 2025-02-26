@@ -24,5 +24,5 @@ void ChunkManager::updateDynamicBlocks()
 	}
 
 	if (!bulkModification.modifications.empty())
-		m_gameServicesInterface.emit<GameEventTypes::BLOCK_MODIFIED_BULK>(bulkModification);
+		m_gameServicesInterface.emit<GameEventTypes::BLOCK_MODIFIED_BULK>(std::move(bulkModification));
 }

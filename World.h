@@ -24,7 +24,7 @@ private:
 	Player m_player;
 	Generator m_generator;
 	ChunkManager m_chunkManager;
-	EventSystemInterface<GameEventPolicy> m_eventSystemInterface;
+	GameServicesInterface<GameEventPolicy> m_interface;
 	//entity data
 
 public:

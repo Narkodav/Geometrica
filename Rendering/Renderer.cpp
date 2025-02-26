@@ -104,7 +104,7 @@ void Renderer::setForThread(unsigned int parameters, int renderDistance, float a
     m_shaders[static_cast<size_t>(Shaders::SHADER_LIQUID)].set("shaders/liquid.shader");
     m_shaders[static_cast<size_t>(Shaders::SHADER_BLOCK_HIGHLIGHT)].set("shaders/blockHighlight.shader");
     m_shaders[static_cast<size_t>(Shaders::SHADER_SKYBOX)].set("shaders/skybox.shader");
-    m_shaders[static_cast<size_t>(Shaders::SHADER_FLAT_TO_SCREEN)].set("shaders/FlatToScreen.shader");
+    /*m_shaders[static_cast<size_t>(Shaders::SHADER_FLAT_TO_SCREEN)].set("shaders/FlatToScreen.shader");*/
 
     debugBillboard.set();
     m_mesh.emplace(m_renderDistance, m_gameServicesInterface, *chunkMapHandle);

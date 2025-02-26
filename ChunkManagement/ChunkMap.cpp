@@ -149,7 +149,7 @@ void ChunkMap::decoupleChunks(MT::Synchronized<ChunkMapData>::WriteAccess& mapAc
 	}
 }
 
-void ChunkMap::changeBlock(const BlockModifiedEvent& blockModification)
+void ChunkMap::changeBlock(BlockModifiedEvent&& blockModification)
 {
 	glm::ivec2 chunkCoords = Utils::tileToChunkCoord(blockModification.blockCoord, constChunkSize);
 	glm::ivec3 localCoords = Utils::globalToLocal(blockModification.blockCoord, constChunkSize);
@@ -165,7 +165,13 @@ void ChunkMap::changeBlock(const BlockModifiedEvent& blockModification)
 		{
 			auto chunkAccess = chunk->second.getCenter()->getWriteAccess();
 			previousId = chunkAccess.data.getBlockId(localCoords.y, localCoords.x, localCoords.z);
-			chunkAccess.data.setBlock(localCoords.y, localCoords.x, localCoords.z, blockModification.blockId);
+			if (blockModification.newDynamicData == nullptr)
+			{
+				chunkAccess.data.setBlock(localCoords.y, localCoords.x, localCoords.z, blockModification.blockId);
+			}
+			else chunkAccess.data.setBlock(localCoords.y, localCoords.x, localCoords.z, BlockData(
+				blockModification.blockId, std::move(blockModification.newDynamicData)));
+			
 		}
 		coupleChunks(access, chunk->second, chunkCoords);
 		m_eventSystemInterface.emit<GameEventTypes::BLOCK_REMESH>(

@@ -114,13 +114,12 @@ void ChunkMesh::replaceBlock(const BlockRemeshEvent& data, Chunk::ReadAccess& ac
 {
 	if (data.currentId == data.previousId)
 	{
-		if (data.currentId != DataRepository::airId) {
-			const std::unique_ptr<BlockTemplate>& block = DataRepository::getBlock(data.currentId);
-			auto mesherIndex = static_cast<size_t>(block->getMesherType());
-			m_meshers[mesherIndex]->removeData(data.blockCoord, &access);
-			m_meshers[mesherIndex]->addData(data.blockCoord, data.currentId, &access);
-		}
-		else return;
+		if (data.previousId == DataRepository::airId)
+			return;
+		const std::unique_ptr<BlockTemplate>& block = DataRepository::getBlock(data.currentId);
+		auto mesherIndex = static_cast<size_t>(block->getMesherType());
+		m_meshers[mesherIndex]->removeData(data.blockCoord, &access);
+		m_meshers[mesherIndex]->addData(data.blockCoord, data.currentId, &access);
 	}
 	else if (data.previousId == DataRepository::airId)
 	{
@@ -133,6 +132,15 @@ void ChunkMesh::replaceBlock(const BlockRemeshEvent& data, Chunk::ReadAccess& ac
 		const std::unique_ptr<BlockTemplate>& block = DataRepository::getBlock(data.previousId);
 		m_meshers[static_cast<size_t>(block->getMesherType())]->removeData(
 			data.blockCoord, &access);
+	}
+	else
+	{
+		const std::unique_ptr<BlockTemplate>& blockCur = DataRepository::getBlock(data.currentId);
+		const std::unique_ptr<BlockTemplate>& blockPrev = DataRepository::getBlock(data.previousId);
+		auto mesherIndexPrev = static_cast<size_t>(blockPrev->getMesherType());
+		auto mesherIndexCur = static_cast<size_t>(blockCur->getMesherType());
+		m_meshers[mesherIndexPrev]->removeData(data.blockCoord, &access);
+		m_meshers[mesherIndexCur]->addData(data.blockCoord, data.currentId, &access);
 	}
 }
 

@@ -4,14 +4,14 @@ World::World(int loadDistance, unsigned int worldSeed,
 	const Player& player, const GameServicesInterface<GameEventPolicy>& gameServicesInterface) :
 	m_loadDistance(loadDistance), m_worldSeed(worldSeed), m_player(player),
 	m_chunkManager(gameServicesInterface, m_generator, m_loadDistance),
-	m_eventSystemInterface(gameServicesInterface)
+	m_interface(gameServicesInterface)
 {
 	m_generator.set(m_worldSeed);
 };
 
 void World::handleInputs(Mouse& mouse, const Keyboard& keyboard, float deltaTime)
 {
-	m_player.handleInputs(mouse, keyboard, m_eventSystemInterface);
+	m_player.handleInputs(mouse, keyboard, m_interface);
 	m_player.handleMouseMove(mouse, deltaTime);
 	
 }

@@ -14,6 +14,7 @@
 #include "GameEvents.h"
 #include "Multithreading/EventSystem.h"
 #include "DataManagement/Blocks/DynamicBlockTemplate.h"
+#include "DataManagement/Blocks/DynamicBlockDataFactory.h"
 
 class Player
 {
@@ -47,7 +48,7 @@ public:
 	Player& operator=(Player&&) = default;
 
 	void handleInputs(const Mouse& mouse, const Keyboard& keyboard,
-		EventSystemInterface<GameEventPolicy> interface);
+		GameServicesInterface<GameEventPolicy> interface);
 	void handleMouseMove(Mouse& mouse, float delta);
 
 	void update(float deltaTime, const PhysicsManager::MapQueryInterface& chunkMap);

@@ -73,14 +73,14 @@ protected:
 	bool m_isSource;
 
 public:
-	//LiquidBlockData(glm::ivec3 coord) :
-	//	DynamicBlockDataTemplate(coord), m_currentLevel(sourceLevel), m_isSource(true) {};
+	LiquidBlockData(glm::ivec3 coord, uint32_t id) :
+		DynamicBlockDataTemplate(coord, id), m_currentLevel(sourceLevel), m_isSource(true) {};
 
-	LiquidBlockData(glm::ivec3 coord, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) :
-		DynamicBlockDataTemplate(coord, lastUpdatedTick, nextUpdateScheduledTick), m_currentLevel(sourceLevel), m_isSource(true) {};
+	LiquidBlockData(glm::ivec3 coord, uint32_t id, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) :
+		DynamicBlockDataTemplate(coord, id, lastUpdatedTick, nextUpdateScheduledTick), m_currentLevel(sourceLevel), m_isSource(true) {};
 
-	LiquidBlockData(glm::ivec3 coord, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick, bool isSource, unsigned char level) :
-		DynamicBlockDataTemplate(coord, lastUpdatedTick, nextUpdateScheduledTick), m_currentLevel(level), m_isSource(isSource) {};
+	LiquidBlockData(glm::ivec3 coord, uint32_t id, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick, bool isSource, unsigned char level) :
+		DynamicBlockDataTemplate(coord, id, lastUpdatedTick, nextUpdateScheduledTick), m_currentLevel(level), m_isSource(isSource) {};
 
 	virtual ~LiquidBlockData() override = default;
 	virtual BlockModifiedBulkEvent update(const MapUpdateQueryInterface& map, const GameClockInterface& clock) override;
@@ -93,7 +93,7 @@ public:
 
 	virtual std::unique_ptr<DynamicBlockDataTemplate> clone() override {
 		return std::make_unique<LiquidBlockData>(
-			m_position, m_lastUpdatedTick, m_nextUpdateScheduledTick, m_isSource, m_currentLevel);
+			m_position, m_id, m_lastUpdatedTick, m_nextUpdateScheduledTick, m_isSource, m_currentLevel);
 	};
 };
 
@@ -121,5 +121,11 @@ public:
 	virtual std::string getType() const { return "LiquidBlock"; };
 
 	uint32_t getAtlasIndex(Materials material) const { return m_atlasIndices[static_cast<size_t>(material)]; };
+
+	virtual std::unique_ptr<DynamicBlockDataTemplate>&& getBlockData(const glm::ivec3& blockCoord, uint32_t id,
+		const GameClockInterface& clock) const override {
+		return DynamicBlockDataFactory::createBlockData(getType(), blockCoord, id,
+			clock.getGlobalTime(), clock.getGlobalTime() + m_ticksToSpread);
+	}
 };
 

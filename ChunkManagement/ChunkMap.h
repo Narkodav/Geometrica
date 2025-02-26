@@ -173,6 +173,6 @@ public:
 
 	auto getMapDataAccess() const { return m_mapData.getReadAccess(); };
 
-	void changeBlock(const BlockModifiedEvent& blockModification); //use the event system
+	void changeBlock(BlockModifiedEvent&& blockModification); //use the event system
 };
 

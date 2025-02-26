@@ -40,22 +40,22 @@ void DataRepository::setBlocks()
 	}
 }
 
-void DataRepository::setModels()
-{
-	std::vector<std::string> modelPaths;
-	readPaths(modelPaths, m_resourcesFilepath + "/models/modelNames.txt");
-
-	std::ostringstream path;
-
-	for (int i = 0; i < modelPaths.size(); i++)
-	{
-		path << m_resourcesFilepath << "/models/" << modelPaths[i] << ".obj";
-		m_models[modelPaths[i]].load(path.str());
-		path.str("");
-		path.clear();
-	}
-	m_models["NONE"] = Model();
-}
+//void DataRepository::setModels()
+//{
+//	std::vector<std::string> modelPaths;
+//	readPaths(modelPaths, m_resourcesFilepath + "/models/modelNames.txt");
+//
+//	std::ostringstream path;
+//
+//	for (int i = 0; i < modelPaths.size(); i++)
+//	{
+//		path << m_resourcesFilepath << "/models/" << modelPaths[i] << ".obj";
+//		m_models[modelPaths[i]].load(path.str());
+//		path.str("");
+//		path.clear();
+//	}
+//	m_models["NONE"] = Model();
+//}
 
 void DataRepository::setCuboids()
 {
@@ -141,16 +141,16 @@ void DataRepository::set(std::string resourcesFilepath)
 		std::cout << "name: " << texture.first << std::endl;
 	}
 #endif //_DEBUG
-	setModels();
-#ifdef _DEBUG
-	std::cout << std::endl;
-	std::cout << "models:" << std::endl;
-	for (const auto& model : m_models)
-	{
-		std::cout << "name:               " << model.first << std::endl;
-		std::cout << "number of meshes:   " << model.second.getNumOfMeshes() << std::endl;
-	}
-#endif //_DEBUG
+//	setModels();
+//#ifdef _DEBUG
+//	std::cout << std::endl;
+//	std::cout << "models:" << std::endl;
+//	for (const auto& model : m_models)
+//	{
+//		std::cout << "name:               " << model.first << std::endl;
+//		std::cout << "number of meshes:   " << model.second.getNumOfMeshes() << std::endl;
+//	}
+//#endif //_DEBUG
 	setCuboids();
 #ifdef _DEBUG
 	std::cout << std::endl;

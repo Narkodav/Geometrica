@@ -163,7 +163,7 @@ void Game::close()
 
 int Game::run()
 {
-    int loadDistance = 20;
+    int loadDistance = 3;
     int numOfAllocatedThreads = /*std::thread::hardware_concurrency() * 0.7*/ 4;
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(0);
