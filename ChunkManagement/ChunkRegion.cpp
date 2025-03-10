@@ -46,7 +46,7 @@ void ChunkRegion::addAdjacentChunk(ChunkPtr chunk, Directions2DHashed direction)
 		for (int y = 0; y < constWorldHeight; y++)
 			for (int z = 0; z < constChunkSize; z++)
 			{
-				auto data = adjAccess.data.getBlock(y, constChunkSize, z);
+				auto data = adjAccess.data.getBlock(y, constChunkSize - 1, z);
 				if (data.dynamicData == nullptr)
 					centerAccess.data.setBlock(y, -1, z, data.blockId);
 				else centerAccess.data.setBlock(y, -1, z, data);
@@ -68,7 +68,7 @@ void ChunkRegion::addAdjacentChunk(ChunkPtr chunk, Directions2DHashed direction)
 		for (int y = 0; y < constWorldHeight; y++)
 			for (int x = 0; x < constChunkSize; x++)
 			{
-				auto data = adjAccess.data.getBlock(y, x, constChunkSize);
+				auto data = adjAccess.data.getBlock(y, x, constChunkSize - 1);
 				if (data.dynamicData == nullptr)
 					centerAccess.data.setBlock(y, x, -1, data.blockId);
 				else centerAccess.data.setBlock(y, x, -1, data);

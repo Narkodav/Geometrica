@@ -7,6 +7,9 @@
 
 #include "platformCommon.h"
 #include "Physics/Hitboxes.h"
+#include "GameContext.h"
+
+class GameEventPolicy;
 
 class BlockTemplate
 {
@@ -41,4 +44,7 @@ public:
 	static std::string parseBlockType(const std::string& filepath);
 	virtual bool loadFromFile(const std::string& filepath) = 0;
 	virtual bool isDynamic() { return false; };
+
+	virtual bool onPlayerPlace(const BlockRaycastResult& result,
+		const GameServicesInterface<GameEventPolicy>& interface) const = 0;
 };

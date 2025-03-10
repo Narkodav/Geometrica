@@ -15,7 +15,7 @@ glm::vec3 PhysicsManager::handleBlockCollision(const Phys::Hitbox* entityHitbox,
 	return delta;
 }
 
-glm::vec3 PhysicsManager::handlePlayerCollisions(glm::vec3 playerCoords, glm::vec3 delta, const MapQueryInterface& chunkMap)
+glm::vec3 PhysicsManager::handlePlayerCollisions(glm::vec3 playerCoords, glm::vec3 delta, const MapPhysicsInterface& chunkMap)
 {
 	glm::ivec3 gridCoords = playerCoords;
 	glm::vec3 hitboxCoords = playerCoords;
@@ -36,7 +36,8 @@ glm::vec3 PhysicsManager::handlePlayerCollisions(glm::vec3 playerCoords, glm::ve
 
 }
 
-PhysicsManager::BlockRaycastResult PhysicsManager::raycastBlock(Phys::RayCasting::Ray ray, float maxDistance, const MapQueryInterface& chunkMap)
+BlockRaycastResult PhysicsManager::raycastBlock(
+	Phys::RayCasting::Ray ray, float maxDistance, const MapPhysicsInterface& chunkMap)
 {
 	Phys::RayCasting::Ray rayOffset = ray;
 	rayOffset.origin += 0.5;

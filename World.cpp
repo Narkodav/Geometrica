@@ -18,7 +18,7 @@ void World::handleInputs(Mouse& mouse, const Keyboard& keyboard, float deltaTime
 
 void World::physicsUpdate(float deltaTime)
 {
-	m_player.update(deltaTime, m_chunkManager.getMapQuery());
+	m_player.update(deltaTime, m_chunkManager.getMapInterface());
 	m_chunkManager.updateDynamicBlocks();
 	/*m_chunkManager.update(m_player.getChunkCoords());*/
 }

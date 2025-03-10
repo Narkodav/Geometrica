@@ -90,46 +90,83 @@ bool LiquidBlock::setFaceMaterial(int faceIndex, const std::string& materialName
     return true;
 }
 
+void LiquidBlockData::onAdjacentUpdate(const MapUpdateInterface& map, const GameClockInterface& clock) {
+    m_nextUpdateScheduledTick = clock.getGlobalTime() + static_cast<const LiquidBlock*>(m_parentBlockType)->getTicksToSpread();
+};
 
-BlockModifiedBulkEvent LiquidBlockData::update(const MapUpdateQueryInterface& map, const GameClockInterface& clock) {
+BlockModifiedBulkEvent LiquidBlockData::update(const MapUpdateInterface& map, const GameClockInterface& clock) {
     //if (m_isSource)
     //    return updateForSource(map, gameEvents);
     //else return updateForFlowing(map, gameEvents);
-    const std::unique_ptr<BlockTemplate>& block = DataRepository::getBlock(m_id);
+    if (m_currentLevel - levelDecline == 0)
+        return BlockModifiedBulkEvent();
+
     BlockModifiedBulkEvent event;
     uint32_t blockId = map.getBlockId(m_position);
     m_lastUpdatedTick = clock.getGlobalTime();
     m_nextUpdateScheduledTick = m_lastUpdatedTick + 30;
 
     glm::ivec3 adjPos = m_position + constDirectionVectors3DHashed[
+        static_cast<size_t>(Directions3DHashed::DIRECTION_DOWN)];
+    if (m_id == map.getBlockId(adjPos) && !m_isSource)
+        return BlockModifiedBulkEvent();
+
+    adjPos = m_position + constDirectionVectors3DHashed[
         static_cast<size_t>(Directions3DHashed::DIRECTION_FORWARD)];
 
     if (DataRepository::airId == map.getBlockId(adjPos))
-        event.modifications.push_back(BlockModifiedEvent(adjPos, m_id,
-            std::move(static_cast<LiquidBlock*>(block.get())->getBlockData(adjPos, m_id, clock))));
+    {
+        auto data = static_cast<const LiquidBlock*>(m_parentBlockType)->getBlockData(adjPos, m_id, clock);
+        static_cast<LiquidBlockData*>(data.get())->m_currentLevel = m_currentLevel - levelDecline;
+        static_cast<LiquidBlockData*>(data.get())->m_isSource = false;
+        event.modifications.emplace_back(adjPos, m_id, std::move(data));
+    }
 
     adjPos = m_position + constDirectionVectors3DHashed[
         static_cast<size_t>(Directions3DHashed::DIRECTION_BACKWARD)];
     if (DataRepository::airId == map.getBlockId(adjPos))
-        event.modifications.push_back(BlockModifiedEvent(adjPos, m_id,
-            std::move(static_cast<LiquidBlock*>(block.get())->getBlockData(adjPos, m_id, clock))));
+    {
+        auto data = static_cast<const LiquidBlock*>(m_parentBlockType)->getBlockData(adjPos, m_id, clock);
+        static_cast<LiquidBlockData*>(data.get())->m_currentLevel = m_currentLevel - levelDecline;
+        static_cast<LiquidBlockData*>(data.get())->m_isSource = false;
+        event.modifications.emplace_back(adjPos, m_id, std::move(data));
+    }
 
     adjPos = m_position + constDirectionVectors3DHashed[
         static_cast<size_t>(Directions3DHashed::DIRECTION_LEFT)];
     if (DataRepository::airId == map.getBlockId(adjPos))
-        event.modifications.push_back(BlockModifiedEvent(adjPos, m_id,
-            std::move(static_cast<LiquidBlock*>(block.get())->getBlockData(adjPos, m_id, clock))));
+    {
+        auto data = static_cast<const LiquidBlock*>(m_parentBlockType)->getBlockData(adjPos, m_id, clock);
+        static_cast<LiquidBlockData*>(data.get())->m_currentLevel = m_currentLevel - levelDecline;
+        static_cast<LiquidBlockData*>(data.get())->m_isSource = false;
+        event.modifications.emplace_back(adjPos, m_id, std::move(data));
+    }
 
     adjPos = m_position + constDirectionVectors3DHashed[
         static_cast<size_t>(Directions3DHashed::DIRECTION_RIGHT)];
     if (DataRepository::airId == map.getBlockId(adjPos))
-        event.modifications.push_back(BlockModifiedEvent(adjPos, m_id,
-            std::move(static_cast<LiquidBlock*>(block.get())->getBlockData(adjPos, m_id, clock))));
+    {
+        auto data = static_cast<const LiquidBlock*>(m_parentBlockType)->getBlockData(adjPos, m_id, clock);
+        static_cast<LiquidBlockData*>(data.get())->m_currentLevel = m_currentLevel - levelDecline;
+        static_cast<LiquidBlockData*>(data.get())->m_isSource = false;
+        event.modifications.emplace_back(adjPos, m_id, std::move(data));
+    }
+
+    adjPos = m_position + constDirectionVectors3DHashed[
+        static_cast<size_t>(Directions3DHashed::DIRECTION_UP)];
+
+    if (m_id == map.getBlockId(adjPos))
+    {
+        auto data = static_cast<const LiquidBlock*>(m_parentBlockType)->getBlockData(m_position, m_id, clock);
+        static_cast<LiquidBlockData*>(data.get())->m_currentLevel = 16;
+        static_cast<LiquidBlockData*>(data.get())->m_isSource = m_isSource;
+        event.modifications.emplace_back(m_position, m_id, std::move(data));
+    }
 
     return event;
 }
 
-std::vector<glm::ivec3> LiquidBlockData::getAvailableDirections(const MapUpdateQueryInterface& map, glm::ivec3 blockCoord)
+std::vector<glm::ivec3> LiquidBlockData::getAvailableDirections(const MapUpdateInterface& map, glm::ivec3 blockCoord)
 {
     //std::vector<glm::ivec3> result;
     //glm::ivec3 coord;
@@ -152,9 +189,10 @@ std::vector<glm::ivec3> LiquidBlockData::getAvailableDirections(const MapUpdateQ
     //}
 
     //return result;
+    return std::vector<glm::ivec3>();
 }
 
-BlockModifiedBulkEvent LiquidBlockData::updateForSource(const MapUpdateQueryInterface& map)
+BlockModifiedBulkEvent LiquidBlockData::updateForSource(const MapUpdateInterface& map)
 {
     //LiquidBlockPathFinderContext context([&map, this](const glm::ivec3& blockCoord) {
     //    return getAvailableDirections(map, blockCoord); });
@@ -194,10 +232,10 @@ BlockModifiedBulkEvent LiquidBlockData::updateForSource(const MapUpdateQueryInte
     //    return updateData;
     //}
     //
-    //return BlockModifiedBulkEvent();
+    return BlockModifiedBulkEvent();
 }
 
-BlockModifiedBulkEvent LiquidBlockData::updateForFlowing(const MapUpdateQueryInterface& map)
+BlockModifiedBulkEvent LiquidBlockData::updateForFlowing(const MapUpdateInterface& map)
 {
     return BlockModifiedBulkEvent();
 

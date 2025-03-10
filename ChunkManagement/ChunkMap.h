@@ -82,7 +82,7 @@ public:
 
 	~ChunkMap() {
 		MT::ThreadPool& handle = m_loadingTaskCoordinator.getPoolHandle();
-		while (handle.queueSize());
+		while (handle.getQueueSize());
 		m_mapData.getWriteAccess()->clear();
 		while (m_chunkPool.getAllocatedSize())
 		{

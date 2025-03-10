@@ -137,7 +137,7 @@ public:
 
 	inline unsigned int getWorkerAmount() const { return m_threadPool->getWorkerAmount(); };
 
-	inline size_t queueSize() const { return m_threadPool->queueSize(); };
+	inline size_t getQueueSize() const { return m_threadPool->getQueueSize(); };
 };
 
 class GameClockInterface

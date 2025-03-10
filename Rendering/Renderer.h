@@ -58,7 +58,7 @@ public:
 		glm::mat3 viewWithoutTranspos;
 		glm::mat4 interpolatedView;
 		glm::ivec2 chunkCoords;
-		PhysicsManager::BlockRaycastResult raycastResult;
+		BlockRaycastResult raycastResult;
 		Area selectedArea;
 	};
 

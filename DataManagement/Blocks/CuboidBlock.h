@@ -12,6 +12,8 @@
 #include "DataManagement/Cuboid.h"
 #include "BlockTemplate.h"
 #include "BlockFactory.h"
+#include "GameContext.h"
+#include "GameEvents.h"
 
 class CuboidBlock : public BlockTemplate //block that uses cuboids for models, use this as a template for cuboid blocks types
 {
@@ -40,6 +42,13 @@ public:
 
 	virtual BlockMesherType getMesherType() const { return BlockMesherType::MESHING_CUBOID; };
 	virtual std::string getType() const { return "CuboidBlock"; };
+	virtual bool onPlayerPlace(const BlockRaycastResult& result,
+		const GameServicesInterface<GameEventPolicy>& interface) const override {
+		interface.emit<GameEventTypes::BLOCK_MODIFIED>(
+			BlockModifiedEvent{ result.blockPos + glm::ivec3(result.hitNormal),
+			getId(), nullptr });
+		return true;
+	}
 
 private:
 	bool loadCuboidData(const std::string& cuboidName);

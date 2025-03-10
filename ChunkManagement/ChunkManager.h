@@ -6,23 +6,24 @@
 #include "GameContext.h"
 #include "PhysicsManager.h"
 #include "DataManagement/Blocks/DynamicBlockTemplate.h"
+#include "BlockUpdateQueue.h"
 
 class ChunkManager
 {
 public:
     using Subscription = MT::EventSystem<GameEventPolicy>::Subscription;
 
-    struct ChunkMapQuery : public MapUpdateQueryInterface,
-    public PhysicsManager::MapQueryInterface
+    struct ChunkMapIterface : public MapUpdateInterface,
+    public PhysicsManager::MapPhysicsInterface
 	{
     private:
         const ChunkMap& chunkMap;
 
     public:
 
-        explicit ChunkMapQuery(const ChunkMap& map) : chunkMap(map) {}
+        explicit ChunkMapIterface(const ChunkMap& map) : chunkMap(map) {}
 
-        ~ChunkMapQuery() = default;
+        ~ChunkMapIterface() = default;
 
         uint32_t getBlockId(glm::ivec3 blockCoords) const override {
             return chunkMap.getBlockId(blockCoords);
@@ -46,7 +47,7 @@ private:
     Subscription m_blockUpdateSubscription;
     Subscription m_blockBulkUpdateSubscription;
 
-    /*std::unordered_set<glm::ivec3> m_blockUpdateQueue;*/
+    BlockUpdateQueue m_blockUpdateQueue;
 
 public:
     ChunkManager(const GameServicesInterface<GameEventPolicy>& gameServicesInterface, Generator& generatorHandle,
@@ -57,17 +58,72 @@ public:
         m_blockUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_MODIFIED>
             ([this](BlockModifiedEvent&& data)
                 { 
-                    m_chunkMap.changeBlock(std::move(data));
+                    handleBlockUpdate(std::move(data));
                 })),
         m_blockBulkUpdateSubscription(gameServicesInterface.subscribe<GameEventTypes::BLOCK_MODIFIED_BULK>
             ([this](BlockModifiedBulkEvent&& events)
                 {
                     for (auto& data : events.modifications)
-                        m_chunkMap.changeBlock(std::move(data));
+                        handleBlockUpdate(std::move(data));
                 })) {};
 
 
-    ChunkMapQuery getMapQuery() const { return ChunkMapQuery(m_chunkMap); };
+    void handleBlockUpdate(BlockModifiedEvent&& data)
+    {
+        auto cooeds = data.blockCoord;
+
+        //update block
+        if (data.newDynamicData != nullptr)
+            m_blockUpdateQueue.push(data);
+        m_chunkMap.changeBlock(std::move(data));
+
+        //schedule updates for adjacent blocks
+        for (int i = 0; i < 6; i++)
+        {
+            auto adjCoords = cooeds + constDirectionVectors3DHashed[i];
+            auto adjData = m_chunkMap.getBlock(adjCoords);
+            if (adjData.dynamicData == nullptr)
+                continue;
+            adjData.dynamicData->onAdjacentUpdate(
+                getMapInterface(),
+                m_gameServicesInterface);
+            BlockModifiedEvent event(adjCoords, adjData.blockId, std::move(adjData.dynamicData));
+            m_blockUpdateQueue.push(event);
+        }
+    }
+
+    //void handleBlockUpdate(BlockModifiedEvent&& data)
+    //{
+    //    BlockModifiedBulkEvent bulk;
+    //    auto cooeds = data.blockCoord;
+
+    //    if (data.newDynamicData != nullptr)
+    //    {
+    //        auto dataCopy = data.newDynamicData->clone();
+    //        m_chunkMap.changeBlock(std::move(data));
+    //        bulk = dataCopy->update(
+    //            getMapInterface(),
+    //            m_gameServicesInterface);
+    //    }
+    //    else m_chunkMap.changeBlock(std::move(data));
+
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        auto adjCoords = cooeds + constDirectionVectors3DHashed[i];
+    //        auto bulkAdj = m_chunkMap.getBlockData(adjCoords)->update(
+    //            getMapInterface(),
+    //            m_gameServicesInterface);
+    //        for (BlockModifiedEvent& ptr : bulkAdj.modifications) {
+    //            bulk.modifications.emplace_back(std::move(ptr));
+    //        }
+    //    }
+
+    //    for (BlockModifiedEvent& ptr : bulk.modifications) {
+    //        m_blockUpdateQueue.push(std::move(ptr));
+    //    }
+    //}
+
+    inline ChunkMapIterface getMapInterface() const { return ChunkMapIterface(m_chunkMap); };
 	
 	void updateChunkMap(const glm::ivec2& coords);
 

@@ -64,7 +64,7 @@ public:
 
     
     BlockModifiedBulkEvent updateDynamicBlocks(
-        const MapUpdateQueryInterface& map, const GameClockInterface& clock) const
+        const MapUpdateInterface& map, const GameClockInterface& clock) const
     {
         if (m_dynamicBlockData.empty())
             return BlockModifiedBulkEvent();
@@ -85,16 +85,17 @@ public:
         return bulkEvent;
     };
 
-    //BlockModifiedBulkEvent updateDynamicBlock(const MapUpdateQueryInterface& map, const glm::ivec3& blockCoord) const
-    //{
-    //    if (m_dynamicBlockData.empty())
-    //        return BlockModifiedBulkEvent();
+    BlockModifiedBulkEvent updateDynamicBlock(const MapUpdateInterface& map,
+        const GameClockInterface& clock, const glm::ivec3& blockCoord) const
+    {
+        if (m_dynamicBlockData.empty())
+            return BlockModifiedBulkEvent();
 
-    //    auto data = m_dynamicBlockData.find(blockCoord);
-    //    if (data != m_dynamicBlockData.end())
-    //        return data->second->update(map);
-    //    return BlockModifiedBulkEvent();
-    //};
+        auto data = m_dynamicBlockData.find(blockCoord);
+        if (data != m_dynamicBlockData.end())
+            return data->second->update(map, clock);
+        return BlockModifiedBulkEvent();
+    };
 
     inline const glm::ivec2 getCoords() const { return m_coords; };
     inline void setCoords(glm::ivec2 newCoords) { m_coords = newCoords; };

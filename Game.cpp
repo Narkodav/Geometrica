@@ -236,8 +236,8 @@ int Game::run()
 #endif
     }
 
+    m_gameServices.threadPool.shutdown();
     m_renderer.terminate();
-
     //Logger::displayLog();
 
     return 0;

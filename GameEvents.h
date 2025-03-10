@@ -10,12 +10,12 @@
 //utility structs:
 struct BlockModifiedEvent {
     glm::ivec3 blockCoord;
-    unsigned int blockId;
+    uint32_t blockId;
     std::unique_ptr<DynamicBlockDataTemplate> newDynamicData = nullptr; //not necessary
 
     BlockModifiedEvent() = default;
 
-    BlockModifiedEvent(glm::ivec3 blockCoord, unsigned int blockId,
+    BlockModifiedEvent(glm::ivec3 blockCoord, uint32_t blockId,
         std::unique_ptr<DynamicBlockDataTemplate> newDynamicData = nullptr) :
         blockCoord(blockCoord),
         blockId(blockId),
@@ -30,8 +30,8 @@ struct BlockModifiedEvent {
 
 struct BlockRemeshEvent {
     glm::ivec3 blockCoord;
-    unsigned int currentId;
-    unsigned int previousId;
+    uint32_t currentId;
+    uint32_t previousId;
 };
 
 struct BlockModifiedBulkEvent {

@@ -32,7 +32,7 @@ private:
 	float m_friction = 0.6f; // 1/sec
 	float m_handReach = 5.f;
 	bool m_flightMode;
-	PhysicsManager::BlockRaycastResult m_raycastResult;
+	BlockRaycastResult m_raycastResult;
 	Area m_selectedArea;
 	
 public:
@@ -51,7 +51,7 @@ public:
 		GameServicesInterface<GameEventPolicy> interface);
 	void handleMouseMove(Mouse& mouse, float delta);
 
-	void update(float deltaTime, const PhysicsManager::MapQueryInterface& chunkMap);
+	void update(float deltaTime, const PhysicsManager::MapPhysicsInterface& chunkMap);
 
 	//getters
 
@@ -61,7 +61,7 @@ public:
 	const glm::vec3& getAcceleration() const { return m_acceleration; };
 	const glm::mat4& getView() const { return glm::translate(m_eye.getView(), -m_playerCoords); };
 	const glm::mat4& getViewWithoutTranspos() const { return m_eye.getViewWithoutTranspos(); };
-	const PhysicsManager::BlockRaycastResult& getRaycastResult() const { return m_raycastResult; };
+	const BlockRaycastResult& getRaycastResult() const { return m_raycastResult; };
 	const Area& getSelectedArea() const { return m_selectedArea; };
 	/*friend class PhysicsManager;*/
 };

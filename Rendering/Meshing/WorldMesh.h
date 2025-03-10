@@ -112,7 +112,7 @@ public:
 
 	~WorldMesh() { 
 		MT::ThreadPool& handle = m_taskMeshCoordinator.getPoolHandle();
-		while (handle.queueSize());
+		while (handle.getQueueSize());
 		m_bufferLoadQueue.getWriteAccess()->clear();
 		m_bufferUnloadQueue.getWriteAccess()->clear();
 		m_meshData.getWriteAccess()->clear();

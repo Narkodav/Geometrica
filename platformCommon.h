@@ -193,7 +193,7 @@ struct ComparatorIvec2
 	{
 		// First compare lengths
 		float lenA = glm::dot(glm::vec2(a), glm::vec2(a));
-		float lenB = glm::dot(glm::vec2(b), glm::vec2(a));
+		float lenB = glm::dot(glm::vec2(b), glm::vec2(b));
 
 		if (lenA != lenB) {
 			return lenA < lenB;
@@ -208,10 +208,31 @@ struct ComparatorIvec2
 	}
 };
 
+struct ComparatorIvec3
+{
+	bool operator()(const glm::ivec3& a, const glm::ivec3& b) const
+	{
+		float lenA = glm::dot(glm::vec3(a), glm::vec3(a));
+		float lenB = glm::dot(glm::vec3(b), glm::vec3(b));
+
+		if (lenA != lenB) {
+			return lenA < lenB;
+		}
+
+		if (a.x != b.x) {
+			return a.x < b.x;
+		}
+		else if (a.y != b.y) {
+			return a.y < b.y;
+		}
+		return a.z < b.z;
+	}
+};
+
 struct Area
 {
-	glm::ivec3 corner; //negative x, y, z corner
-	glm::ivec3 sizes;
+	glm::ivec3 corner = glm::ivec3(0); //negative x, y, z corner
+	glm::ivec3 sizes = glm::ivec3(0);
 };
 
 enum class BlockMesherType
@@ -222,6 +243,14 @@ enum class BlockMesherType
 	//MESHING_TRANSPARENT,	//for transparent block types like glass
 	//MESHING_TRANSLUCENT,	//for translucent block types like tinted glass
 	MESHING_NUM				//number of meshing techniques
+};
+
+struct BlockRaycastResult {
+	bool hit;
+	glm::vec3 hitPosition;
+	glm::vec3 hitNormal;
+	glm::ivec3 blockPos;
+	float distance;
 };
 
 

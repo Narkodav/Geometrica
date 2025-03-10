@@ -6,7 +6,7 @@ class DynamicBlockDataFactory
 {
 public:
     // Define type for block creation function
-    using BlockDataCreator = std::function<std::unique_ptr<DynamicBlockDataTemplate>(const glm::ivec3&, uint32_t, uint32_t, uint32_t)>;
+    using BlockDataCreator = std::function<std::unique_ptr<DynamicBlockDataTemplate>(const glm::ivec3&, uint32_t, uint32_t, uint32_t, const BlockTemplate*)>;
 
     // Register a new block type with its creator function
     static void registerBlockDataType(const std::string& blockType, BlockDataCreator creator) {
@@ -15,10 +15,10 @@ public:
 
     // Create block data based on block type
     static std::unique_ptr<DynamicBlockDataTemplate> createBlockData(const std::string& blockType, const glm::ivec3& blockCoord, 
-        uint32_t id, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) {
+        uint32_t id, uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick, const BlockTemplate* parentBlockType) {
         auto it = creators.find(blockType);
         if (it != creators.end()) {
-            return it->second(blockCoord, id, lastUpdatedTick, nextUpdateScheduledTick);
+            return it->second(blockCoord, id, lastUpdatedTick, nextUpdateScheduledTick, parentBlockType);
         }
         std::cerr << "Unknown block type: " << blockType << std::endl;
         __debugbreak();
@@ -34,8 +34,9 @@ public:
     DynamicBlockDataRegistrar(const std::string& typeName) {
         DynamicBlockDataFactory::registerBlockDataType(typeName,
             [](const glm::ivec3& blockCoord, uint32_t id,
-                uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick) {
-                    auto blockData = std::make_unique<T>(blockCoord, id, lastUpdatedTick, nextUpdateScheduledTick);
+                uint32_t lastUpdatedTick, uint32_t nextUpdateScheduledTick, 
+                const BlockTemplate* parentBlockType) {
+                    auto blockData = std::make_unique<T>(blockCoord, id, lastUpdatedTick, nextUpdateScheduledTick, parentBlockType);
                 return blockData;
             }
         );

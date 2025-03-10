@@ -8,21 +8,32 @@ void ChunkManager::updateChunkMap(const glm::ivec2& coords)
 
 void ChunkManager::updateDynamicBlocks()
 {
-
 	BlockModifiedBulkEvent bulkModification;
+
 	{
 		auto access = m_chunkMap.getMapDataAccess();
-		for(auto& region : access->regions)
+		while (!m_blockUpdateQueue.empty() &&
+			m_blockUpdateQueue.top().tick <= m_gameServicesInterface.getGlobalTime())
 		{
-			BlockModifiedBulkEvent bulkModificationBuffer =
-				region.second.getCenter()->getReadAccess().data.updateDynamicBlocks(getMapQuery(),
-					m_gameServicesInterface);
-			for (BlockModifiedEvent& ptr : bulkModificationBuffer.modifications) {
-				bulkModification.modifications.emplace_back(std::move(ptr));
+			auto data = m_blockUpdateQueue.top();
+			m_blockUpdateQueue.pop();
+
+			glm::ivec2 chunkCoords = Utils::tileToChunkCoord(data.coord, constChunkSize);
+			glm::ivec3 localCoords = Utils::globalToLocal(data.coord, constChunkSize);
+
+			const auto& it = access->regions.find(chunkCoords);
+			if (it != access->regions.end())
+			{
+				BlockModifiedBulkEvent event;
+				event = it->second.getCenter()->getReadAccess().data.updateDynamicBlock(getMapInterface(),
+					m_gameServicesInterface, localCoords);
+
+				for (BlockModifiedEvent& ptr : event.modifications) {
+					bulkModification.modifications.emplace_back(std::move(ptr));
+				}
 			}
 		}
 	}
-
 	if (!bulkModification.modifications.empty())
 		m_gameServicesInterface.emit<GameEventTypes::BLOCK_MODIFIED_BULK>(std::move(bulkModification));
 }

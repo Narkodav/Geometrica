@@ -66,12 +66,7 @@ void Player::handleInputs(const Mouse& mouse, const Keyboard& keyboard,
 		//hand animation...
 		if (m_raycastResult.hit)
 		{
-			interface.emit<GameEventTypes::BLOCK_MODIFIED>(
-				BlockModifiedEvent{ m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal),
-				DataRepository::getBlock("water")->getId(), DynamicBlockDataFactory::createBlockData(
-					"LiquidBlock",m_raycastResult.blockPos + glm::ivec3(m_raycastResult.hitNormal),
-					DataRepository::getBlock("water")->getId(),
-					interface.getGlobalTime(),interface.getGlobalTime() + 30) });
+			DataRepository::getBlock("water")->onPlayerPlace(m_raycastResult, interface);
 		}
 	}
 
@@ -86,7 +81,7 @@ void Player::handleMouseMove(Mouse& mouse, float delta)
 
 }
 
-void Player::update(float deltaTime, const PhysicsManager::MapQueryInterface& chunkMap)
+void Player::update(float deltaTime, const PhysicsManager::MapPhysicsInterface& chunkMap)
 {
 	m_acceleration -= m_velocity * m_friction;
 	glm::vec3 deltaPos = m_velocity * deltaTime + m_acceleration * deltaTime * deltaTime * 0.5f;
