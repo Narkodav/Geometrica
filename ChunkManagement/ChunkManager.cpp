@@ -9,7 +9,7 @@ void ChunkManager::updateChunkMap(const glm::ivec2& coords)
 void ChunkManager::updateDynamicBlocks()
 {
 	BlockModifiedBulkEvent bulkModification;
-
+	std::map<glm::ivec3, size_t, ComparatorIvec3> uniqueCoords; //coord and index
 	{
 		auto access = m_chunkMap.getMapDataAccess();
 		while (!m_blockUpdateQueue.empty() &&
@@ -29,7 +29,18 @@ void ChunkManager::updateDynamicBlocks()
 					m_gameServicesInterface, localCoords);
 
 				for (BlockModifiedEvent& ptr : event.modifications) {
-					bulkModification.modifications.emplace_back(std::move(ptr));
+                    auto it = uniqueCoords.find(ptr.blockCoord);
+                    if (it != uniqueCoords.end())
+                    {
+						auto& itVec = bulkModification.modifications[it->second];
+                        if (ptr.newDynamicData->canOverride(itVec.newDynamicData->getType()))
+							itVec = std::move(ptr);
+                    }
+                    else
+                    {
+						uniqueCoords[ptr.blockCoord] = bulkModification.modifications.size();
+						bulkModification.modifications.push_back(std::move(ptr));
+                    }
 				}
 			}
 		}
