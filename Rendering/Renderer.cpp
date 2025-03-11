@@ -165,7 +165,7 @@ void Renderer::toggleBlending()
 
 Renderer::~Renderer()
 {
-    terminate();
+    
 }
 
 void Renderer::setProjection(float aspectRatio, float fov)
@@ -265,6 +265,7 @@ void Renderer::rendererLoop()
         m_frameRateCalculator.addFrameTime(frameEnd - frameStart);
         m_isRendering.store(0);
     }
+    m_gameServicesInterface.waitForAllAndPause();
     m_mesh.reset();
 }
 

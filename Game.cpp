@@ -153,6 +153,7 @@ m_renderer(m_gameServices.getInterface())
 
 Game::~Game()
 {
+    glfwDestroyWindow(m_window);
     glfwTerminate();
 }
 
@@ -163,8 +164,8 @@ void Game::close()
 
 int Game::run()
 {
-    int loadDistance = 3;
-    int numOfAllocatedThreads = /*std::thread::hardware_concurrency() * 0.7*/ 4;
+    int loadDistance = 20;
+    int numOfAllocatedThreads = /*std::thread::hardware_concurrency() * 0.7*/ 16;
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(0);
 
@@ -236,8 +237,9 @@ int Game::run()
 #endif
     }
 
-    m_gameServices.threadPool.shutdown();
     m_renderer.terminate();
+    m_gameServices.threadPool.shutdown();
+    
     //Logger::displayLog();
 
     return 0;
